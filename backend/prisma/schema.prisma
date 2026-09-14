@@ -1,0 +1,269 @@
+// ---------------------------------------------------------------------------
+// Plataforma de Jornada de Trabalho — modelo de domínio
+//
+// Decisões estruturais documentadas em /docs/adr:
+//   ADR-0002  jornada modelada como log append-only de eventos
+//   ADR-0003  registros são imutáveis; correções geram novos registros
+//   ADR-0004  estratégia de fuso horário (UTC + fuso do local do registro)
+//   ADR-0005  fechamento mensal como entidade com ciclo de vida
+// ---------------------------------------------------------------------------
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Role {
+  EMPLOYEE
+  MANAGER
+  HR
+}
+
+/// Tipos de evento que compõem a jornada diária.
+/// A jornada é reconstruída pelo pareamento cronológico destes eventos.
+enum TimeEntryType {
+  CLOCK_IN
+  BREAK_START
+  BREAK_END
+  CLOCK_OUT
+}
+
+/// Origem do registro — relevante para auditoria: uma marcação feita pelo próprio
+/// colaborador em tempo real tem peso probatório diferente de um lançamento manual.
+enum EntrySource {
+  /// Marcado pelo próprio colaborador, em tempo real, pela aplicação.
+  WEB
+  /// Lançado manualmente por RH/gestor em nome do colaborador.
+  MANUAL
+  /// Originado de uma solicitação de correção aprovada.
+  CORRECTION
+  /// Carga inicial / migração de dados legados (planilhas).
+  IMPORT
+}
+
+enum CorrectionType {
+  /// Inclusão de um evento que não chegou a ser registrado.
+  ADD
+  /// Revogação de um evento registrado indevidamente.
+  REMOVE
+  /// Ajuste de horário de um evento existente.
+  MODIFY
+}
+
+enum CorrectionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum ClosingStatus {
+  OPEN
+  CLOSED
+}
+
+// ---------------------------------------------------------------------------
+// Usuários
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String @id @default(uuid()) @db.Uuid
+  name         String
+  email        String @unique
+  passwordHash String
+
+  role Role @default(EMPLOYEE)
+
+  /// Fuso horário contratual do colaborador (IANA, ex.: "America/Sao_Paulo").
+  /// É o padrão de exibição e o fuso de referência do contrato — NÃO é
+  /// necessariamente o fuso em que uma marcação específica foi feita (ver ADR-0004).
+  baseTimezone String
+
+  /// País de vínculo contratual (ISO 3166-1 alpha-2).
+  countryCode String @db.Char(2)
+
+  /// Carga horária diária esperada, em minutos.
+  /// Simplificação consciente: o MVP não modela escala por dia da semana
+  /// nem calendário de feriados por país (ver "Limitações conhecidas" no README).
+  expectedDailyMinutes Int @default(480)
+
+  /// Hierarquia para escopo de visão do gestor.
+  managerId     String? @db.Uuid
+  manager       User?   @relation("TeamMembers", fields: [managerId], references: [id], onDelete: SetNull)
+  directReports User[]  @relation("TeamMembers")
+
+  /// Desligamento é soft delete: o histórico de jornada precisa sobreviver ao vínculo.
+  active Boolean @default(true)
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  timeEntries          TimeEntry[]         @relation("EntryOwner")
+  registeredEntries    TimeEntry[]         @relation("EntryRegisteredBy")
+  ownedCorrections     CorrectionRequest[] @relation("CorrectionOwner")
+  requestedCorrections CorrectionRequest[] @relation("CorrectionRequestedBy")
+  reviewedCorrections  CorrectionRequest[] @relation("CorrectionReviewedBy")
+  closings             MonthlyClosing[]    @relation("ClosingOwner")
+  performedClosings    MonthlyClosing[]    @relation("ClosingPerformedBy")
+
+  @@index([managerId])
+  @@index([role])
+}
+
+// ---------------------------------------------------------------------------
+// Jornada — log append-only
+// ---------------------------------------------------------------------------
+
+/// Um evento pontual da jornada. Linhas NUNCA são atualizadas nem removidas:
+/// um erro é corrigido por meio de CorrectionRequest, que revoga o registro
+/// original (preenchendo revokedAt) e/ou cria um novo (ver ADR-0003).
+model TimeEntry {
+  id String @id @default(uuid()) @db.Uuid
+
+  /// Colaborador a quem a jornada pertence.
+  userId String @db.Uuid
+  user   User   @relation("EntryOwner", fields: [userId], references: [id])
+
+  type TimeEntryType
+
+  /// Instante absoluto do evento, em UTC.
+  /// Para marcações em tempo real este valor é definido pelo SERVIDOR — nunca pelo
+  /// cliente — para que o relógio do dispositivo não seja vetor de fraude de ponto.
+  occurredAt DateTime @db.Timestamptz(3)
+
+  /// Fuso IANA vigente no local onde a marcação foi feita. Pode divergir do
+  /// baseTimezone do colaborador quando ele está em viagem internacional.
+  timezone String
+
+  /// País onde a marcação foi feita (ISO 3166-1 alpha-2). Pode divergir do
+  /// countryCode contratual — é o que evidencia jornada realizada em viagem.
+  countryCode String @db.Char(2)
+
+  /// Offset em minutos em relação a UTC no instante do registro.
+  /// Redundante em relação a (occurredAt, timezone), mas persistido de propósito:
+  /// a tz database muda (países alteram regras de horário de verão), e um registro
+  /// de ponto não pode mudar de horário retroativamente por atualização de biblioteca.
+  utcOffsetMinutes Int
+
+  /// Dia da jornada ao qual o evento pertence, resolvido no fuso LOCAL do registro
+  /// e congelado na criação. É a chave de agregação de folha de ponto (ver ADR-0004).
+  workDate DateTime @db.Date
+
+  source EntrySource @default(WEB)
+  note   String?
+
+  /// Quem efetivamente criou a linha. Difere de userId em lançamentos feitos
+  /// por RH ou gestor em nome do colaborador.
+  registeredById String @db.Uuid
+  registeredBy   User   @relation("EntryRegisteredBy", fields: [registeredById], references: [id])
+
+  /// Correção aprovada que originou este registro (quando source = CORRECTION).
+  originCorrectionId String?            @unique @db.Uuid
+  originCorrection   CorrectionRequest? @relation("CorrectionCreatedEntry", fields: [originCorrectionId], references: [id])
+
+  /// Revogação lógica. Um registro revogado permanece na base para auditoria,
+  /// mas é ignorado no cálculo da jornada.
+  revokedAt             DateTime?          @db.Timestamptz(3)
+  revokedByCorrectionId String?            @db.Uuid
+  revokedByCorrection   CorrectionRequest? @relation("CorrectionRevokedEntry", fields: [revokedByCorrectionId], references: [id])
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  /// Consulta dominante: jornada de um colaborador num intervalo de dias.
+  @@index([userId, workDate])
+  /// Consulta secundária: ordenação cronológica absoluta (relatórios cross-fuso).
+  @@index([userId, occurredAt])
+  @@index([workDate])
+}
+
+// ---------------------------------------------------------------------------
+// Correções
+// ---------------------------------------------------------------------------
+
+/// Solicitação de ajuste na jornada. Passa por aprovação do gestor (ou do RH)
+/// antes de produzir efeito sobre os registros.
+model CorrectionRequest {
+  id String @id @default(uuid()) @db.Uuid
+
+  /// Colaborador dono da jornada afetada.
+  userId String @db.Uuid
+  user   User   @relation("CorrectionOwner", fields: [userId], references: [id])
+
+  requestedById String @db.Uuid
+  requestedBy   User   @relation("CorrectionRequestedBy", fields: [requestedById], references: [id])
+
+  type CorrectionType
+
+  /// Registro alvo — obrigatório para REMOVE e MODIFY, nulo para ADD.
+  targetEntryId String? @db.Uuid
+
+  /// Proposta de novo evento — usada em ADD e MODIFY.
+  proposedType       TimeEntryType?
+  proposedOccurredAt DateTime?      @db.Timestamptz(3)
+  proposedTimezone   String?
+  proposedCountry    String?        @db.Char(2)
+
+  /// Dia da jornada afetado (facilita a consulta de pendências por período).
+  workDate DateTime @db.Date
+
+  /// Justificativa é obrigatória: é o que dá rastreabilidade ao ajuste.
+  reason String
+
+  status       CorrectionStatus @default(PENDING)
+  reviewedById String?          @db.Uuid
+  reviewedBy   User?            @relation("CorrectionReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt   DateTime?        @db.Timestamptz(3)
+  reviewNote   String?
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  /// Efeitos produzidos quando aprovada.
+  createdEntry TimeEntry?  @relation("CorrectionCreatedEntry")
+  revokedEntry TimeEntry[] @relation("CorrectionRevokedEntry")
+
+  @@index([userId, workDate])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// Fechamento mensal
+// ---------------------------------------------------------------------------
+
+/// Competência mensal de um colaborador. Enquanto OPEN, a jornada aceita
+/// registros e correções; uma vez CLOSED, o período fica congelado e só o RH
+/// pode reabri-lo (ver ADR-0005).
+model MonthlyClosing {
+  id String @id @default(uuid()) @db.Uuid
+
+  userId String @db.Uuid
+  user   User   @relation("ClosingOwner", fields: [userId], references: [id])
+
+  year  Int
+  month Int // 1-12
+
+  status ClosingStatus @default(OPEN)
+
+  /// Snapshot congelado no instante do fechamento. Persistido em vez de recalculado
+  /// para que o valor homologado não mude se uma regra de cálculo evoluir depois.
+  workedMinutes   Int?
+  expectedMinutes Int?
+  balanceMinutes  Int?
+
+  closedById String? @db.Uuid
+  closedBy   User?   @relation("ClosingPerformedBy", fields: [closedById], references: [id])
+  closedAt   DateTime? @db.Timestamptz(3)
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  @@unique([userId, year, month])
+  @@index([year, month, status])
+}
