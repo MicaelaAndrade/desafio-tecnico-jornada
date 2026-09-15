@@ -1,0 +1,57 @@
+.correcoes {
+  max-width: 50rem;
+  margin: 0 auto;
+}
+
+.lista {
+  display: grid;
+  gap: 0.75rem;
+  padding-top: 1rem;
+}
+
+.cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  .dia {
+    margin: 0.15rem 0 0;
+    font-size: 0.8125rem;
+    opacity: 0.7;
+    text-transform: capitalize;
+  }
+}
+
+.proposta {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+}
+
+.justificativa {
+  margin: 0.75rem 0 0;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid rgb(0 0 0 / 15%);
+  background: rgb(0 0 0 / 3%);
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+.meta {
+  margin: 0.5rem 0 0;
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.analisada {
+  opacity: 0.85;
+}
+
+.vazio {
+  opacity: 0.6;
+  text-align: center;
+  padding: 2rem 0;
+}

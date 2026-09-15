@@ -1,0 +1,90 @@
+<div class="correcoes">
+  @if (carregando()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+
+  <mat-tab-group>
+    <mat-tab [label]="'Pendentes (' + pendentes().length + ')'">
+      <div class="lista">
+        @for (correcao of pendentes(); track correcao.id) {
+          <mat-card>
+            <mat-card-content>
+              <div class="cabecalho">
+                <div>
+                  <strong>{{ correcao.userName }}</strong>
+                  <p class="dia">{{ rotuloDia(correcao.workDate) }}</p>
+                </div>
+                <mat-chip-set>
+                  <mat-chip>{{ rotuloTipo(correcao) }}</mat-chip>
+                </mat-chip-set>
+              </div>
+
+              @if (correcao.proposedOccurredAt) {
+                <p class="proposta">
+                  <mat-icon inline>schedule</mat-icon>
+                  Horário proposto: {{ horarioProposto(correcao) }}
+                  ({{ correcao.proposedTimezone }})
+                </p>
+              }
+
+              <blockquote class="justificativa">{{ correcao.reason }}</blockquote>
+
+              <p class="meta">
+                Solicitada em {{ correcao.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+              </p>
+            </mat-card-content>
+
+            <mat-card-actions align="end">
+              @if (podeCancelar(correcao)) {
+                <button mat-button (click)="cancelar(correcao)">Cancelar solicitação</button>
+              }
+              @if (podeHomologar(correcao)) {
+                <button mat-button (click)="rejeitar(correcao)">Rejeitar</button>
+                <button mat-flat-button color="primary" (click)="homologar(correcao)">
+                  Homologar
+                </button>
+              }
+            </mat-card-actions>
+          </mat-card>
+        } @empty {
+          <p class="vazio">Nenhuma correção aguardando homologação.</p>
+        }
+      </div>
+    </mat-tab>
+
+    <mat-tab [label]="'Histórico (' + analisadas().length + ')'">
+      <div class="lista">
+        @for (correcao of analisadas(); track correcao.id) {
+          <mat-card class="analisada">
+            <mat-card-content>
+              <div class="cabecalho">
+                <div>
+                  <strong>{{ correcao.userName }}</strong>
+                  <p class="dia">{{ rotuloDia(correcao.workDate) }}</p>
+                </div>
+                <mat-chip-set>
+                  <mat-chip [highlighted]="correcao.status === 'APPROVED'">
+                    {{ rotuloStatus(correcao.status) }}
+                  </mat-chip>
+                </mat-chip-set>
+              </div>
+
+              <blockquote class="justificativa">{{ correcao.reason }}</blockquote>
+
+              @if (correcao.reviewedAt) {
+                <p class="meta">
+                  Analisada em {{ correcao.reviewedAt | date: 'dd/MM/yyyy HH:mm' }}
+                  @if (correcao.reviewNote) {
+                    · {{ correcao.reviewNote }}
+                  }
+                </p>
+              }
+            </mat-card-content>
+          </mat-card>
+        } @empty {
+          <p class="vazio">Nenhuma correção analisada ainda.</p>
+        }
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
