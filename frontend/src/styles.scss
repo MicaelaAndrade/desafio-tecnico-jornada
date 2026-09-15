@@ -21,6 +21,23 @@ html {
   --superficie-fundo: #f4f5f7;
 }
 
+// O Material posiciona o texto de apoio e a mensagem de erro de forma absoluta,
+// numa faixa de altura fixa: qualquer texto mais longo que uma linha é cortado
+// no meio. Tirando o posicionamento absoluto, o texto flui e quebra normalmente.
+.mat-mdc-form-field-subscript-wrapper {
+  height: auto;
+
+  .mat-mdc-form-field-hint-wrapper,
+  .mat-mdc-form-field-error-wrapper {
+    position: static;
+  }
+
+  .mat-mdc-form-field-hint,
+  mat-error {
+    white-space: normal;
+  }
+}
+
 html,
 body {
   height: 100%;

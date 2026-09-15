@@ -47,6 +47,20 @@ demonstração é inserida automaticamente.
 | Documentação da API (Swagger) | http://localhost:3000/api/docs |
 | Banco (PostgreSQL) | `localhost:5432` — usuário/senha/base: `jornada` |
 
+### Modo demonstração (sem banco, sem Docker)
+
+Para avaliar a interface e os fluxos sem montar infraestrutura:
+
+```bash
+cd backend && npm install && npm run demo      # API na porta 3000
+cd frontend && npm install && npm start        # aplicação em http://localhost:4200
+```
+
+A aplicação é a real — mesmas rotas, guards, validação e regras de cálculo. O que muda é
+apenas o acesso a dados, servido pelo repositório em memória usado nos testes, com o mesmo
+cenário do seed. Os dados vivem no processo e somem ao reiniciar; migrations, constraints e
+transações não são exercitadas nesse modo. Para avaliar a persistência, use o Docker acima.
+
 ### Execução local, sem Docker
 
 Requisitos: Node.js 22+ e uma instância de PostgreSQL 16.

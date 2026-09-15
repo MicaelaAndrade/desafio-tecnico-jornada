@@ -82,7 +82,14 @@ export interface DadosCorrecao {
         <mat-form-field appearance="outline">
           <mat-label>Justificativa</mat-label>
           <textarea matInput rows="3" formControlName="reason"></textarea>
-          <mat-hint>Mínimo de 10 caracteres — fica registrada na trilha de auditoria.</mat-hint>
+          @if (form.controls.reason.touched && form.controls.reason.invalid) {
+            <mat-error>
+              Descreva o que aconteceu em pelo menos 10 caracteres — é isso que dá rastreabilidade
+              ao ajuste.
+            </mat-error>
+          } @else {
+            <mat-hint>Fica registrada na trilha de auditoria, junto de quem homologou.</mat-hint>
+          }
         </mat-form-field>
       </form>
     </mat-dialog-content>
