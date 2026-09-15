@@ -1,0 +1,48 @@
+@if (mostrarChrome()) {
+  <mat-toolbar color="primary" class="barra">
+    <span class="marca">Jornada</span>
+
+    <nav class="navegacao">
+      <a mat-button routerLink="/ponto" routerLinkActive="ativo">
+        <mat-icon>schedule</mat-icon>
+        <span class="rotulo">Ponto</span>
+      </a>
+
+      <a mat-button routerLink="/espelho" routerLinkActive="ativo">
+        <mat-icon>description</mat-icon>
+        <span class="rotulo">Espelho</span>
+      </a>
+
+      @if (auth.ehGestor()) {
+        <a mat-button routerLink="/equipe" routerLinkActive="ativo">
+          <mat-icon>groups</mat-icon>
+          <span class="rotulo">Equipe</span>
+        </a>
+      }
+
+      <a mat-button routerLink="/correcoes" routerLinkActive="ativo">
+        <mat-icon>edit_note</mat-icon>
+        <span class="rotulo">Correções</span>
+      </a>
+    </nav>
+
+    <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Conta">
+      <span class="avatar">{{ iniciais() }}</span>
+    </button>
+
+    <mat-menu #menu="matMenu">
+      <div class="identidade" mat-menu-item disabled>
+        <strong>{{ auth.usuario()?.name }}</strong>
+        <small>{{ auth.usuario()?.baseTimezone }}</small>
+      </div>
+      <button mat-menu-item (click)="sair()">
+        <mat-icon>logout</mat-icon>
+        Sair
+      </button>
+    </mat-menu>
+  </mat-toolbar>
+}
+
+<main [class.com-barra]="mostrarChrome()">
+  <router-outlet />
+</main>
