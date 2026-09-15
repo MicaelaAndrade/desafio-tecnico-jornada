@@ -214,7 +214,12 @@ export function calculateDailyTimesheet(
   const workedMinutes = segments.reduce((sum, s) => sum + s.workedMinutes, 0);
 
   // Fim de semana não gera expectativa de horas; feriados não são tratados no MVP.
-  const expectsHours = (options.expectHoursOnWeekends ?? false) || !isWeekend(workDate);
+  // Dia futuro também não: cobrar jornada de um dia que ainda não chegou criaria
+  // um saldo devedor fictício. A comparação é lexicográfica porque datas ISO
+  // ordenam cronologicamente como texto.
+  const noFuturo = options.referenceDate !== undefined && workDate > options.referenceDate;
+  const expectsHours =
+    !noFuturo && ((options.expectHoursOnWeekends ?? false) || !isWeekend(workDate));
   const expectedMinutes = expectsHours ? options.expectedDailyMinutes : 0;
 
   return {

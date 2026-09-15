@@ -7,6 +7,7 @@ import {
   assertWorkDate,
   firstDayOfMonth,
   lastDayOfMonth,
+  resolveWorkDate,
   workDateToDb,
 } from '../../common/time/work-date';
 import {
@@ -52,6 +53,7 @@ export class TimesheetsService {
     const options: TimesheetCalculationOptions = {
       expectedDailyMinutes: user.expectedDailyMinutes,
       baseTimezone: user.baseTimezone,
+      referenceDate: this.hojeDoColaborador(user.baseTimezone),
     };
 
     const monthly = calculateMonthlyTimesheet(year, month, rows.map(toDomainEvent), options);
@@ -105,6 +107,7 @@ export class TimesheetsService {
     const options: TimesheetCalculationOptions = {
       expectedDailyMinutes: user.expectedDailyMinutes,
       baseTimezone: user.baseTimezone,
+      referenceDate: this.hojeDoColaborador(user.baseTimezone),
     };
 
     return [...byDate.entries()]
@@ -172,7 +175,11 @@ export class TimesheetsService {
         year,
         month,
         (entriesByUser.get(user.id) ?? []).map(toDomainEvent),
-        { expectedDailyMinutes: user.expectedDailyMinutes, baseTimezone: user.baseTimezone },
+        {
+          expectedDailyMinutes: user.expectedDailyMinutes,
+          baseTimezone: user.baseTimezone,
+          referenceDate: this.hojeDoColaborador(user.baseTimezone),
+        },
       );
 
       return {
@@ -187,6 +194,17 @@ export class TimesheetsService {
         closingStatus: closingByUser.get(user.id) ?? ClosingStatus.OPEN,
       };
     });
+  }
+
+  /**
+   * Hoje no fuso contratual do colaborador.
+   *
+   * É o corte entre dia decorrido e dia futuro no cálculo do saldo: quem está em
+   * Berlim já virou o dia quando em São Paulo ainda é ontem, e a folha precisa
+   * respeitar o calendário de quem ela descreve.
+   */
+  private hojeDoColaborador(baseTimezone: string): WorkDate {
+    return resolveWorkDate(new Date(), baseTimezone);
   }
 
   /** Registros revogados nunca entram no cálculo (ADR-0003). */

@@ -68,6 +68,17 @@ export class PontoComponent implements OnInit, OnDestroy {
 
   readonly emViagem = computed(() => this.fuso() !== this.auth.usuario()?.baseTimezone);
 
+  /** Uma jornada aberta em dia anterior é pendência, não expediente em andamento. */
+  readonly jornadaAbertaEHoje = computed(() => {
+    const aberta = this.status()?.openWorkDate;
+    return !aberta || aberta === this.dataLocalDeHoje();
+  });
+
+  readonly jornadaAbertaDeOutroDia = computed(() => {
+    const aberta = this.status()?.openWorkDate;
+    return Boolean(aberta) && aberta !== this.dataLocalDeHoje();
+  });
+
   readonly totalTrabalhadoHoje = computed(() => {
     const marcacoes = [...this.marcacoesDeHoje()].sort(
       (a, b) => new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime(),
@@ -87,8 +98,12 @@ export class PontoComponent implements OnInit, OnDestroy {
       }
     }
 
-    // Enquanto a jornada está aberta, o contador acompanha o relógio.
-    if (inicio !== null) total += this.agora().getTime() - inicio;
+    // O contador só acompanha o relógio se a jornada aberta for de hoje. Uma
+    // entrada esquecida em dia anterior faria o número crescer indefinidamente —
+    // apareceriam "84h trabalhadas" em vez da pendência que de fato existe.
+    if (inicio !== null && this.jornadaAbertaEHoje()) {
+      total += this.agora().getTime() - inicio;
+    }
 
     return Math.max(0, Math.round(total / 60_000));
   });

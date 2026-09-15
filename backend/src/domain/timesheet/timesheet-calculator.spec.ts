@@ -334,3 +334,55 @@ describe('calculateMonthlyTimesheet', () => {
     expect(result.daysWithInconsistencies).toBe(1);
   });
 });
+
+describe('dias futuros', () => {
+  // Sem data de referência, a folha do mês corrente cobraria jornada de todos os
+  // dias ainda por vir e exibiria um saldo devedor crescente que não existe.
+  it('não gera expectativa de horas para dia posterior à referência', () => {
+    const result = calculateDailyTimesheet('2026-09-20', [], {
+      ...BASE_OPTIONS,
+      referenceDate: '2026-09-14',
+    });
+
+    expect(result.expectedMinutes).toBe(0);
+    expect(result.balanceMinutes).toBe(0);
+  });
+
+  it('mantém a expectativa no próprio dia da referência', () => {
+    const result = calculateDailyTimesheet('2026-09-14', [], {
+      ...BASE_OPTIONS,
+      referenceDate: '2026-09-14',
+    });
+
+    expect(result.expectedMinutes).toBe(480);
+    expect(result.balanceMinutes).toBe(-480);
+  });
+
+  it('contabiliza o que foi trabalhado adiantado, sem cobrar a jornada', () => {
+    const result = calculateDailyTimesheet(
+      '2026-09-20',
+      [
+        event(CLOCK_IN, '2026-09-20T12:00:00Z', { workDate: '2026-09-20' }),
+        event(CLOCK_OUT, '2026-09-20T16:00:00Z', { workDate: '2026-09-20' }),
+      ],
+      { ...BASE_OPTIONS, referenceDate: '2026-09-14' },
+    );
+
+    expect(result.workedMinutes).toBe(240);
+    expect(result.expectedMinutes).toBe(0);
+    expect(result.balanceMinutes).toBe(240);
+  });
+
+  it('limita o saldo do mês aos dias já decorridos', () => {
+    const semReferencia = calculateMonthlyTimesheet(2026, 9, [], BASE_OPTIONS);
+    const ateODia14 = calculateMonthlyTimesheet(2026, 9, [], {
+      ...BASE_OPTIONS,
+      referenceDate: '2026-09-14',
+    });
+
+    // Setembro de 2026 tem 22 dias úteis, dos quais 10 até o dia 14.
+    expect(semReferencia.expectedMinutes).toBe(22 * 480);
+    expect(ateODia14.expectedMinutes).toBe(10 * 480);
+    expect(ateODia14.days).toHaveLength(30);
+  });
+});

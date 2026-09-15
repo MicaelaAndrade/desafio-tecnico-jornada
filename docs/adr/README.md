@@ -26,9 +26,11 @@ Consolidadas aqui por conveniência; o detalhamento está em cada ADR.
    marcação foi feita**, não no fuso contratual do colaborador.
 3. Carga horária esperada é um valor diário por colaborador. Escala por dia da semana e
    calendário de feriados por país estão fora do MVP.
-4. Sábados, domingos e feriados não recebem tratamento diferenciado no cálculo de saldo no
-   MVP — os eventos são registrados normalmente, mas a expectativa de horas não é ajustada.
-5. Horas extras e adicional noturno não são apurados: o sistema entrega horas trabalhadas
+4. Sábados e domingos não geram expectativa de horas; feriados não são tratados, e por isso
+   aparecem como dia útil com débito.
+5. Dias futuros aparecem na folha sem gerar expectativa de horas: o saldo do mês corrente
+   considera apenas os dias já decorridos, pelo calendário do fuso contratual do colaborador.
+6. Horas extras e adicional noturno não são apurados: o sistema entrega horas trabalhadas
    e saldo em relação ao esperado, deixando a política de remuneração para a folha.
-6. A hierarquia de gestão tem um nível (gestor → subordinado direto).
-7. Não há multi-tenancy: a instância atende uma empresa.
+7. A hierarquia de gestão tem um nível (gestor → subordinado direto).
+8. Não há multi-tenancy: a instância atende uma empresa.

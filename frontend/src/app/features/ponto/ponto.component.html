@@ -19,6 +19,14 @@
         </mat-chip-set>
       </div>
 
+      @if (jornadaAbertaDeOutroDia()) {
+        <p class="aviso-pendencia">
+          <mat-icon inline>error_outline</mat-icon>
+          Há uma jornada de {{ status()?.openWorkDate }} sem registro de saída. Encerre-a ou
+          solicite correção no espelho de ponto.
+        </p>
+      }
+
       <div class="local">
         <mat-icon inline>public</mat-icon>
         <span>{{ fuso() }}</span>

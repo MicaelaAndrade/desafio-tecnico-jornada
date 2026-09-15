@@ -72,7 +72,7 @@ não há configuração de CORS a fazer em desenvolvimento.
 ### Testes
 
 ```bash
-# Backend — 82 testes
+# Backend — 86 testes
 cd backend
 npm test                # suíte completa
 npm run test:unit       # apenas as regras de domínio
@@ -235,9 +235,9 @@ Documentação interativa em `/api/docs`. Principais recursos:
 
 ### Testes
 
-São 114 testes — 82 no backend e 32 no frontend —, concentrados onde o risco está.
+São 118 testes — 86 no backend e 32 no frontend —, concentrados onde o risco está.
 
-**Regras de domínio (44).** Funções puras, testadas sem banco, sem framework e sem mock:
+**Regras de domínio (48).** Funções puras, testadas sem banco, sem framework e sem mock:
 
 - turno que cruza a meia-noite mantido como jornada única;
 - transição de horário de verão em Portugal — cinco horas reais contabilizadas onde o
@@ -293,10 +293,14 @@ em resumo:
 3. A carga horária esperada é um valor diário por colaborador.
 4. Fim de semana não gera expectativa de horas; o que for trabalhado é contabilizado como
    crédito.
-5. Horas extras e adicional noturno não são apurados — o sistema entrega horas
+5. Dias que ainda não chegaram aparecem na folha, mas não geram expectativa de horas — o
+   saldo do mês corrente reflete apenas os dias decorridos. O corte usa o calendário do
+   fuso contratual do colaborador, de modo que quem está em Berlim vira o dia antes de
+   quem está em São Paulo.
+6. Horas extras e adicional noturno não são apurados — o sistema entrega horas
    trabalhadas e saldo, deixando a política de remuneração para a folha de pagamento.
-6. A hierarquia de gestão tem um nível (gestor → subordinado direto).
-7. A instância atende uma única empresa; não há multi-tenancy.
+7. A hierarquia de gestão tem um nível (gestor → subordinado direto).
+8. A instância atende uma única empresa; não há multi-tenancy.
 
 ## Limitações conhecidas
 

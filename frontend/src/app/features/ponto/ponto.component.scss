@@ -48,8 +48,24 @@
   opacity: 1;
 }
 
+.aviso-pendencia {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin: 0 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--mat-sys-error, #b3261e) 10%, transparent);
+  color: var(--mat-sys-error, #b3261e);
+  font-size: 0.8125rem;
+  text-align: left;
+}
+
 .campo-pais {
-  width: 12rem;
+  // Largura suficiente para o texto de apoio caber em uma linha; sem isso a dica
+  // quebra em duas e invade os botões de marcação.
+  width: min(100%, 17rem);
 }
 
 .acoes {

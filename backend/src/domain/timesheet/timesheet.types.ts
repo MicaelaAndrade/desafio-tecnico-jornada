@@ -115,6 +115,15 @@ export interface TimesheetCalculationOptions {
    * ver "Limitações conhecidas" no README.
    */
   expectHoursOnWeekends?: boolean;
+
+  /**
+   * Último dia que já aconteceu, do ponto de vista do colaborador.
+   *
+   * Dias posteriores a ele aparecem na folha, mas não geram expectativa de horas:
+   * cobrar jornada de um dia que ainda não chegou produziria um saldo devedor
+   * fictício, crescente até o fim do mês. Quando omitido, todos os dias contam.
+   */
+  referenceDate?: WorkDate;
   /** Acima disso, o turno é sinalizado como implausível. Padrão: 16 horas. */
   maxShiftMinutes?: number;
 }
