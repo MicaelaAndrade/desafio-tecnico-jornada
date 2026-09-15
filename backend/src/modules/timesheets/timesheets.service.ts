@@ -19,11 +19,7 @@ import {
 } from '../../domain/timesheet/timesheet.types';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { toDomainEvent, toResponse } from '../time-entries/time-entry.mapper';
-import {
-  DailyTimesheetDto,
-  MonthlyTimesheetDto,
-  TeamMemberSummaryDto,
-} from './dto/timesheet.dto';
+import { DailyTimesheetDto, MonthlyTimesheetDto, TeamMemberSummaryDto } from './dto/timesheet.dto';
 
 @Injectable()
 export class TimesheetsService {

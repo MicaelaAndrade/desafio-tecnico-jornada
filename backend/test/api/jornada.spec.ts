@@ -282,7 +282,9 @@ describe('API · registro e consulta de jornada', () => {
       expect(nomes).toContain('Bruno Almeida');
       expect(nomes).not.toContain('Carla Nunes');
 
-      const ana = resposta.body.find((m: { userId: string }) => m.userId === ambiente.usuarios.ana.id);
+      const ana = resposta.body.find(
+        (m: { userId: string }) => m.userId === ambiente.usuarios.ana.id,
+      );
       expect(ana.workedMinutes).toBe(480);
     });
   });

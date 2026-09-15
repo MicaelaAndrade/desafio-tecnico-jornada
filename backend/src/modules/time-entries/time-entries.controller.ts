@@ -59,7 +59,8 @@ export class TimeEntriesController {
   @Get('status')
   @ApiOperation({
     summary: 'Estado atual da jornada do usuário autenticado',
-    description: 'Indica qual marcação é válida a seguir, para que a interface não ofereça uma inválida.',
+    description:
+      'Indica qual marcação é válida a seguir, para que a interface não ofereça uma inválida.',
   })
   @ApiResponse({ status: 200, type: ShiftStatusDto })
   currentStatus(@CurrentUser() user: AuthenticatedUser): Promise<ShiftStatusDto> {

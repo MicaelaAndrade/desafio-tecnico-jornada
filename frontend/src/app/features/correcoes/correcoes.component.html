@@ -22,16 +22,15 @@
               @if (correcao.proposedOccurredAt) {
                 <p class="proposta">
                   <mat-icon inline>schedule</mat-icon>
-                  Horário proposto: {{ horarioProposto(correcao) }}
-                  ({{ correcao.proposedTimezone }})
+                  Horário proposto: {{ horarioProposto(correcao) }} ({{
+                    correcao.proposedTimezone
+                  }})
                 </p>
               }
 
               <blockquote class="justificativa">{{ correcao.reason }}</blockquote>
 
-              <p class="meta">
-                Solicitada em {{ correcao.createdAt | date: 'dd/MM/yyyy HH:mm' }}
-              </p>
+              <p class="meta">Solicitada em {{ correcao.createdAt | date: 'dd/MM/yyyy HH:mm' }}</p>
             </mat-card-content>
 
             <mat-card-actions align="end">

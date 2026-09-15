@@ -10,7 +10,6 @@ import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   imports: [
     RouterOutlet,
     RouterLink,

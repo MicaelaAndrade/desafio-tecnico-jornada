@@ -17,9 +17,18 @@ import {
 import { AccessScopeService } from '../../common/auth/access-scope.service';
 import { AuthenticatedUser } from '../../common/auth/auth.decorators';
 import { assertValidTimezone, offsetMinutesAt } from '../../common/time/timezone';
-import { WorkDate, assertWorkDate, workDateFromDb, workDateToDb } from '../../common/time/work-date';
+import {
+  WorkDate,
+  assertWorkDate,
+  workDateFromDb,
+  workDateToDb,
+} from '../../common/time/work-date';
 import { PrismaService } from '../../infra/prisma/prisma.service';
-import { CorrectionResponseDto, CreateCorrectionDto, ReviewCorrectionDto } from './dto/correction.dto';
+import {
+  CorrectionResponseDto,
+  CreateCorrectionDto,
+  ReviewCorrectionDto,
+} from './dto/correction.dto';
 
 type CorrectionWithUser = CorrectionRequest & { user: Pick<User, 'name'> };
 
@@ -114,10 +123,7 @@ export class CorrectionsService {
     await this.assertCompetenceOpen(correction.userId, workDate);
 
     const updated = await this.prisma.$transaction(async (tx) => {
-      if (
-        correction.type === CorrectionType.REMOVE ||
-        correction.type === CorrectionType.MODIFY
-      ) {
+      if (correction.type === CorrectionType.REMOVE || correction.type === CorrectionType.MODIFY) {
         const target = await tx.timeEntry.findUnique({ where: { id: correction.targetEntryId! } });
         if (!target || target.revokedAt) {
           throw new ConflictException('A marcação alvo já foi revogada por outra correção.');

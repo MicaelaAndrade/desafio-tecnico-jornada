@@ -62,7 +62,11 @@ export async function criarAmbienteApi(): Promise<AmbienteApi> {
   const passwordHash = await bcrypt.hash(SENHA_TESTE, 4);
 
   const criar = (dados: Omit<UsuarioDeTeste, 'id'> & { managerId?: string }): UsuarioDeTeste => {
-    const registro = prisma.user.semear({ ...dados, passwordHash, email: dados.email.toLowerCase() });
+    const registro = prisma.user.semear({
+      ...dados,
+      passwordHash,
+      email: dados.email.toLowerCase(),
+    });
     return registro as UsuarioDeTeste;
   };
 

@@ -1,23 +1,20 @@
 @use '@angular/material' as mat;
 
-@include mat.core();
-
-$tema: mat.define-theme(
-  (
-    color: (
-      theme-type: light,
-      primary: mat.$azure-palette,
-      tertiary: mat.$blue-palette,
-    ),
-    density: (
-      scale: 0,
-    ),
-  )
-);
-
+// API de tema baseada em tokens (Material 3). Além de gerar bem menos CSS que
+// `all-component-themes`, ela expõe as variáveis de sistema `--mat-sys-*`, que os
+// estilos dos componentes usam para cores de erro, superfície e destaque — assim a
+// paleta fica definida em um lugar só, em vez de repetida em hexadecimal.
 html {
-  @include mat.all-component-themes($tema);
-  @include mat.typography-hierarchy($tema);
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
 }
 
 :root {

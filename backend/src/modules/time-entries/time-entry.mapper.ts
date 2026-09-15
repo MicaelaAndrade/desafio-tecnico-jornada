@@ -1,10 +1,7 @@
 import { TimeEntry as PrismaTimeEntry } from '@prisma/client';
 import { localTimeFromFrozenOffset } from '../../common/time/timezone';
 import { workDateFromDb } from '../../common/time/work-date';
-import {
-  TimesheetEvent,
-  TimesheetEventType,
-} from '../../domain/timesheet/timesheet.types';
+import { TimesheetEvent, TimesheetEventType } from '../../domain/timesheet/timesheet.types';
 import { TimeEntryResponseDto } from './dto/time-entry.dto';
 
 /**

@@ -2,7 +2,9 @@ import { DateTime, IANAZone } from 'luxon';
 
 export class InvalidTimezoneError extends Error {
   constructor(value: unknown) {
-    super(`Fuso horário inválido: ${String(value)} (esperado identificador IANA, ex.: America/Sao_Paulo)`);
+    super(
+      `Fuso horário inválido: ${String(value)} (esperado identificador IANA, ex.: America/Sao_Paulo)`,
+    );
     this.name = 'InvalidTimezoneError';
   }
 }
@@ -53,6 +55,10 @@ export function zoneLabelAt(instant: Date, timeZone: string): string {
 }
 
 /** Formata um instante no fuso informado, para logs e relatórios legíveis. */
-export function formatInZone(instant: Date, timeZone: string, format = "yyyy-MM-dd HH:mm 'UTC'ZZ"): string {
+export function formatInZone(
+  instant: Date,
+  timeZone: string,
+  format = "yyyy-MM-dd HH:mm 'UTC'ZZ",
+): string {
   return DateTime.fromJSDate(instant, { zone: assertValidTimezone(timeZone) }).toFormat(format);
 }

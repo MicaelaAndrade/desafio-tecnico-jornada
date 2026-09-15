@@ -47,7 +47,10 @@ export class TimeEntriesService {
    * (fuso e país), nunca o horário — caso contrário alterar o relógio do celular
    * seria fraude de ponto trivial (ADR-0004, item 2).
    */
-  async register(requester: AuthenticatedUser, dto: RegisterEntryDto): Promise<TimeEntryResponseDto> {
+  async register(
+    requester: AuthenticatedUser,
+    dto: RegisterEntryDto,
+  ): Promise<TimeEntryResponseDto> {
     const timezone = assertValidTimezone(dto.timezone);
     const occurredAt = new Date();
     const utcOffsetMinutes = offsetMinutesAt(occurredAt, timezone);

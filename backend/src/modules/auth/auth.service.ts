@@ -18,7 +18,8 @@ export class AuthService {
     // A mesma mensagem é devolvida para e-mail inexistente e senha incorreta, para
     // não permitir enumeração de usuários. A comparação também roda mesmo quando o
     // usuário não existe, evitando distinção por tempo de resposta.
-    const hash = user?.passwordHash ?? '$2a$10$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalid';
+    const hash =
+      user?.passwordHash ?? '$2a$10$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalid';
     const passwordMatches = await bcrypt.compare(dto.password, hash);
 
     if (!user || !passwordMatches || !user.active) {

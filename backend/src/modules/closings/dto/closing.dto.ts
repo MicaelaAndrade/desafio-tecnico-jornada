@@ -1,7 +1,17 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ClosingStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsBoolean, IsInt, IsOptional, IsString, IsUUID, Max, MaxLength, Min, MinLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Max,
+  MaxLength,
+  Min,
+  MinLength,
+} from 'class-validator';
 
 export class CloseCompetenceDto {
   @ApiProperty({ format: 'uuid' })
@@ -55,7 +65,9 @@ export class ReopenCompetenceDto {
   @Max(12)
   month!: number;
 
-  @ApiProperty({ example: 'Marcação do dia 30 não havia sido lançada; reabertura autorizada pelo RH.' })
+  @ApiProperty({
+    example: 'Marcação do dia 30 não havia sido lançada; reabertura autorizada pelo RH.',
+  })
   @IsString()
   @MinLength(10)
   @MaxLength(500)

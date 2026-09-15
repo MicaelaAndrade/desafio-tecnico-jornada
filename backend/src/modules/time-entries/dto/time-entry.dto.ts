@@ -26,12 +26,16 @@ export class RegisterEntryDto {
 
   @ApiProperty({
     example: 'Europe/Lisbon',
-    description: 'Fuso IANA de onde a marcação está sendo feita. Permite registrar jornada em viagem.',
+    description:
+      'Fuso IANA de onde a marcação está sendo feita. Permite registrar jornada em viagem.',
   })
   @IsString()
   timezone!: string;
 
-  @ApiProperty({ example: 'PT', description: 'País onde a marcação está sendo feita (ISO 3166-1 alpha-2).' })
+  @ApiProperty({
+    example: 'PT',
+    description: 'País onde a marcação está sendo feita (ISO 3166-1 alpha-2).',
+  })
   @IsISO31661Alpha2({ message: 'Informe o país no formato ISO 3166-1 alpha-2 (ex.: BR, PT).' })
   countryCode!: string;
 
@@ -99,7 +103,10 @@ export class QueryEntriesDto {
   @Matches(/^\d{4}-\d{2}-\d{2}$/)
   to?: string;
 
-  @ApiPropertyOptional({ description: 'Inclui registros revogados, para auditoria.', default: false })
+  @ApiPropertyOptional({
+    description: 'Inclui registros revogados, para auditoria.',
+    default: false,
+  })
   @IsOptional()
   @Type(() => Boolean)
   includeRevoked?: boolean;
@@ -130,9 +137,16 @@ export class ShiftStatusDto {
   @ApiPropertyOptional({ type: TimeEntryResponseDto })
   lastEntry?: TimeEntryResponseDto | null;
 
-  @ApiPropertyOptional({ example: '2026-09-14', description: 'Dia da jornada em aberto, se houver.' })
+  @ApiPropertyOptional({
+    example: '2026-09-14',
+    description: 'Dia da jornada em aberto, se houver.',
+  })
   openWorkDate?: string | null;
 
-  @ApiProperty({ enum: TimeEntryType, isArray: true, description: 'Marcações válidas a partir do estado atual.' })
+  @ApiProperty({
+    enum: TimeEntryType,
+    isArray: true,
+    description: 'Marcações válidas a partir do estado atual.',
+  })
   allowedNext!: TimeEntryType[];
 }

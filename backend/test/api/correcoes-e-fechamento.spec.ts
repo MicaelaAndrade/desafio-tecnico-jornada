@@ -285,7 +285,10 @@ describe('API · correções e fechamento de competência', () => {
         })
         .expect(201);
 
-      expect(resposta.body).toMatchObject({ status: 'CLOSED', closedById: ambiente.usuarios.rh.id });
+      expect(resposta.body).toMatchObject({
+        status: 'CLOSED',
+        closedById: ambiente.usuarios.rh.id,
+      });
       expect(resposta.body.workedMinutes).toEqual(expect.any(Number));
       expect(resposta.body.closedAt).not.toBeNull();
     });

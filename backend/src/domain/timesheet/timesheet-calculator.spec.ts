@@ -75,10 +75,7 @@ describe('calculateDailyTimesheet', () => {
     it('ordena eventos recebidos fora de ordem antes de calcular', () => {
       const result = calculateDailyTimesheet(
         '2026-09-14',
-        [
-          event(CLOCK_OUT, '2026-09-14T21:00:00Z'),
-          event(CLOCK_IN, '2026-09-14T12:00:00Z'),
-        ],
+        [event(CLOCK_OUT, '2026-09-14T21:00:00Z'), event(CLOCK_IN, '2026-09-14T12:00:00Z')],
         BASE_OPTIONS,
       );
 
@@ -161,9 +158,7 @@ describe('calculateDailyTimesheet', () => {
       );
 
       expect(result.countries).toEqual(['PT']);
-      expect(result.inconsistencies.map((i) => i.code)).toContain(
-        InconsistencyCode.WORKED_ABROAD,
-      );
+      expect(result.inconsistencies.map((i) => i.code)).toContain(InconsistencyCode.WORKED_ABROAD);
       // Apontamento informativo não invalida a jornada.
       expect(result.isConsistent).toBe(true);
     });
@@ -263,9 +258,7 @@ describe('calculateDailyTimesheet', () => {
 
       // Não há evidência de trabalho entre o início da pausa e a saída.
       expect(result.workedMinutes).toBe(180);
-      expect(result.inconsistencies.map((i) => i.code)).toContain(
-        InconsistencyCode.UNCLOSED_BREAK,
-      );
+      expect(result.inconsistencies.map((i) => i.code)).toContain(InconsistencyCode.UNCLOSED_BREAK);
       // WARNING não invalida o dia, apenas sinaliza.
       expect(result.isConsistent).toBe(true);
     });
@@ -273,10 +266,7 @@ describe('calculateDailyTimesheet', () => {
     it('sinaliza turno com duração implausível', () => {
       const result = calculateDailyTimesheet(
         '2026-09-14',
-        [
-          event(CLOCK_IN, '2026-09-14T08:00:00Z'),
-          event(CLOCK_OUT, '2026-09-15T01:00:00Z'),
-        ],
+        [event(CLOCK_IN, '2026-09-14T08:00:00Z'), event(CLOCK_OUT, '2026-09-15T01:00:00Z')],
         BASE_OPTIONS,
       );
 

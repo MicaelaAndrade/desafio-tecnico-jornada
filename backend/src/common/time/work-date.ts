@@ -76,7 +76,9 @@ export function firstDayOfMonth(year: number, month: number): WorkDate {
 
 /** Último dia da competência (mês) informada. */
 export function lastDayOfMonth(year: number, month: number): WorkDate {
-  return DateTime.fromObject({ year, month }, { zone: 'utc' }).endOf('month').toFormat('yyyy-MM-dd');
+  return DateTime.fromObject({ year, month }, { zone: 'utc' })
+    .endOf('month')
+    .toFormat('yyyy-MM-dd');
 }
 
 /** Sequência inclusiva de dias civis entre `from` e `to`. */

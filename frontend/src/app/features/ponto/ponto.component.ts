@@ -28,7 +28,6 @@ const ROTULO_ESTADO: Record<ShiftStatus['state'], string> = {
 
 @Component({
   selector: 'app-ponto',
-  standalone: true,
   imports: [
     DatePipe,
     FormsModule,

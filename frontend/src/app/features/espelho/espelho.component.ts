@@ -26,7 +26,6 @@ import { SolicitarCorrecaoDialog } from './solicitar-correcao.dialog';
 
 @Component({
   selector: 'app-espelho',
-  standalone: true,
   imports: [
     MatCardModule,
     MatButtonModule,

@@ -34,7 +34,10 @@
           </div>
           <div class="total">
             <span class="rotulo">Saldo</span>
-            <strong [class.negativo]="dados.balanceMinutes < 0" [class.positivo]="dados.balanceMinutes > 0">
+            <strong
+              [class.negativo]="dados.balanceMinutes < 0"
+              [class.positivo]="dados.balanceMinutes > 0"
+            >
               {{ saldo(dados.balanceMinutes) }}
             </strong>
           </div>
@@ -43,7 +46,9 @@
         <div class="marcadores">
           <mat-chip-set>
             <mat-chip [highlighted]="dados.closingStatus === 'CLOSED'">
-              <mat-icon matChipAvatar>{{ dados.closingStatus === 'CLOSED' ? 'lock' : 'lock_open' }}</mat-icon>
+              <mat-icon matChipAvatar>{{
+                dados.closingStatus === 'CLOSED' ? 'lock' : 'lock_open'
+              }}</mat-icon>
               {{ dados.closingStatus === 'CLOSED' ? 'Competência fechada' : 'Competência aberta' }}
             </mat-chip>
 

@@ -48,12 +48,9 @@ describe('workDate', () => {
   });
 
   describe('validação', () => {
-    it.each(['2026-13-01', '10/03/2026', '2026-3-1', '', 'ontem'])(
-      'recusa %p',
-      (value) => {
-        expect(() => assertWorkDate(value)).toThrow(InvalidWorkDateError);
-      },
-    );
+    it.each(['2026-13-01', '10/03/2026', '2026-3-1', '', 'ontem'])('recusa %p', (value) => {
+      expect(() => assertWorkDate(value)).toThrow(InvalidWorkDateError);
+    });
   });
 
   describe('utilitários de período', () => {

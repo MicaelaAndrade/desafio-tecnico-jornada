@@ -1,19 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import {
-  MAT_DIALOG_DATA,
-  MatDialogModule,
-  MatDialogRef,
-} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import {
-  TIPO_MARCACAO_LABEL,
-  TimeEntry,
-  TimeEntryType,
-} from '../../core/models/jornada.models';
+import { TIPO_MARCACAO_LABEL, TimeEntry, TimeEntryType } from '../../core/models/jornada.models';
 import { JornadaService } from '../../core/services/jornada.service';
 import { formatarDiaComSemana } from '../../core/utils/format';
 
@@ -34,7 +26,6 @@ export interface DadosCorrecao {
  */
 @Component({
   selector: 'app-solicitar-correcao',
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     MatDialogModule,

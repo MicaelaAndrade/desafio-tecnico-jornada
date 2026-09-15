@@ -86,7 +86,11 @@ function diasUteisDoMes(): string[] {
   const hoje = DateTime.now().setZone('America/Sao_Paulo');
   const dias: string[] = [];
 
-  for (let cursor = hoje.startOf('month'); cursor < hoje.startOf('day'); cursor = cursor.plus({ days: 1 })) {
+  for (
+    let cursor = hoje.startOf('month');
+    cursor < hoje.startOf('day');
+    cursor = cursor.plus({ days: 1 })
+  ) {
     if (cursor.weekday <= 5) dias.push(cursor.toFormat('yyyy-MM-dd'));
   }
 
@@ -98,7 +102,9 @@ async function main(): Promise<void> {
   // apagaria os dados criados durante a avaliação. Use `--force` para recriar.
   const jaPopulado = await prisma.user.count();
   if (jaPopulado > 0 && !process.argv.includes('--force')) {
-    console.log('Base já populada — seed ignorado. Use "npm run prisma:seed -- --force" para recriar.');
+    console.log(
+      'Base já populada — seed ignorado. Use "npm run prisma:seed -- --force" para recriar.',
+    );
     return;
   }
 

@@ -14,7 +14,6 @@ import { MESES, formatarMinutos, formatarSaldo } from '../../core/utils/format';
 
 @Component({
   selector: 'app-equipe',
-  standalone: true,
   imports: [
     MatCardModule,
     MatButtonModule,
@@ -67,7 +66,9 @@ export class EquipeComponent implements OnInit {
       .fecharCompetencia({ userId: membro.userId, year: this.ano(), month: this.mes(), force })
       .subscribe({
         next: () => {
-          this.snackBar.open(`Competência de ${membro.name} fechada.`, 'Fechar', { duration: 4000 });
+          this.snackBar.open(`Competência de ${membro.name} fechada.`, 'Fechar', {
+            duration: 4000,
+          });
           this.carregar();
         },
         error: (erro) => {
@@ -97,7 +98,9 @@ export class EquipeComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.snackBar.open(`Competência de ${membro.name} reaberta.`, 'Fechar', { duration: 4000 });
+          this.snackBar.open(`Competência de ${membro.name} reaberta.`, 'Fechar', {
+            duration: 4000,
+          });
           this.carregar();
         },
       });

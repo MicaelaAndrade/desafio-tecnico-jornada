@@ -31,7 +31,6 @@ const ROTULO_STATUS: Record<CorrectionStatus, string> = {
 
 @Component({
   selector: 'app-correcoes',
-  standalone: true,
   imports: [
     DatePipe,
     MatCardModule,
@@ -97,9 +96,7 @@ export class CorrecoesComponent implements OnInit {
 
   rotuloTipo(correcao: CorrectionRequest): string {
     const base = ROTULO_TIPO[correcao.type];
-    return correcao.proposedType
-      ? `${base} — ${TIPO_MARCACAO_LABEL[correcao.proposedType]}`
-      : base;
+    return correcao.proposedType ? `${base} — ${TIPO_MARCACAO_LABEL[correcao.proposedType]}` : base;
   }
 
   rotuloStatus(status: CorrectionStatus): string {
