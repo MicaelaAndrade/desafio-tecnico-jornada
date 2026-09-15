@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -46,6 +46,7 @@ const ROTULO_ESTADO: Record<ShiftStatus['state'], string> = {
 export class PontoComponent implements OnInit, OnDestroy {
   private readonly jornada = inject(JornadaService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly zone = inject(NgZone);
   readonly auth = inject(AuthService);
 
   private relogioId?: ReturnType<typeof setInterval>;
@@ -94,7 +95,13 @@ export class PontoComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.carregar();
-    this.relogioId = setInterval(() => this.agora.set(new Date()), 1000);
+
+    // O relógio roda fora da zona do Angular: um timer de 1 segundo dentro dela
+    // dispararia detecção de mudanças na aplicação inteira a cada tique. A tela
+    // continua atualizando porque `agora` é um signal, e quem o lê é notificado.
+    this.zone.runOutsideAngular(() => {
+      this.relogioId = setInterval(() => this.agora.set(new Date()), 1000);
+    });
   }
 
   ngOnDestroy(): void {
