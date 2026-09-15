@@ -1,0 +1,40 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$tema: mat.define-theme(
+  (
+    color: (
+      theme-type: light,
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    density: (
+      scale: 0,
+    ),
+  )
+);
+
+html {
+  @include mat.all-component-themes($tema);
+  @include mat.typography-hierarchy($tema);
+}
+
+:root {
+  --superficie-fundo: #f4f5f7;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--superficie-fundo);
+  font-family: Roboto, 'Helvetica Neue', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
