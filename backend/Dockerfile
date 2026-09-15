@@ -7,7 +7,9 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-RUN apk add --no-cache openssl
+# Os engines do Prisma são binários nativos e, no Alpine, dependem do OpenSSL e da
+# camada de compatibilidade com a glibc. Sem eles o cliente gera mas não conecta.
+RUN apk add --no-cache openssl libc6-compat
 
 COPY package*.json ./
 RUN npm ci

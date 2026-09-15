@@ -1,0 +1,17 @@
+# Sem isto, o `COPY . .` do Dockerfile sobrescreve o node_modules instalado dentro
+# da imagem pelo da máquina de quem builda. O esbuild, usado pelo build do Angular,
+# é binário nativo por plataforma: vindo de um macOS, o build falha dentro da imagem
+# Linux com erro de plataforma incompatível.
+node_modules
+dist
+.angular
+
+.git
+.gitignore
+*.log
+npm-debug.log*
+
+.vscode
+.idea
+.DS_Store
+*.tsbuildinfo

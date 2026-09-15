@@ -1,0 +1,21 @@
+# Sem isto, o `COPY . .` do Dockerfile sobrescreve o node_modules instalado dentro
+# da imagem pelo da máquina de quem builda. Dependências com binário nativo — os
+# engines do Prisma, por exemplo — são compiladas por plataforma, e o contêiner
+# passaria a carregar binários de macOS ou Windows.
+node_modules
+dist
+coverage
+
+.env
+.env.*
+!.env.example
+
+.git
+.gitignore
+*.log
+npm-debug.log*
+
+.vscode
+.idea
+.DS_Store
+*.tsbuildinfo
