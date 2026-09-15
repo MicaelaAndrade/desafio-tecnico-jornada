@@ -8,6 +8,21 @@ O problema a resolver não é apenas substituir a planilha compartilhada por um 
 é eliminar as causas das divergências que ela produz — registros editáveis sem rastro,
 horários ambíguos entre fusos e competências que nunca são formalmente encerradas.
 
+## Sobre a escolha do backend
+
+O enunciado informa que o ecossistema atual da empresa usa majoritariamente tecnologias
+Microsoft no backend, e abre espaço para propostas aderentes ao cenário. **Este projeto
+usa Node.js com NestJS**, e a decisão foi deliberada: em conversa prévia com o time
+responsável pelo processo seletivo, confirmou-se que a posição é voltada para Node.
+
+Como o desafio é avaliado por qualidade de código e decisões de arquitetura, entregar
+código idiomático na tecnologia da vaga pareceu mais informativo do que uma tentativa numa
+stack fora do meu domínio — onde o tempo iria para sintaxe e framework em vez de ir para a
+modelagem, que é o que o enunciado pede.
+
+O frontend permanece em **Angular**, conforme o ecossistema descrito. O raciocínio completo,
+com as alternativas descartadas, está no [ADR-0001](docs/adr/0001-stack-tecnologica.md).
+
 ---
 
 ## Como executar
@@ -57,16 +72,25 @@ não há configuração de CORS a fazer em desenvolvimento.
 ### Testes
 
 ```bash
+# Backend — 82 testes
 cd backend
-npm test                # suíte completa — 82 testes
+npm test                # suíte completa
 npm run test:unit       # apenas as regras de domínio
 npm run test:api        # apenas os testes de API
 npm run test:cov        # com cobertura
+
+# Frontend — 32 testes
+cd ../frontend
+npm test -- --watch=false
 ```
 
-Nenhum teste exige banco de dados, Docker ou aplicação no ar: os testes de API sobem a
-aplicação NestJS de verdade e substituem apenas o acesso a dados por um repositório em
-memória. Rodam em qualquer ambiente e servem como porta de CI.
+Nenhum teste do backend exige banco de dados, Docker ou aplicação no ar: os testes de API
+sobem a aplicação NestJS de verdade e substituem apenas o acesso a dados por um repositório
+em memória. Rodam em qualquer ambiente e servem como porta de CI.
+
+Os testes do frontend rodam em Chrome headless. Em ambiente sem Chrome instalado, aponte a
+variável `CHROME_BIN` para o executável — o launcher já está configurado sem sandbox, para
+funcionar dentro de contêiner.
 
 ---
 
@@ -211,7 +235,7 @@ Documentação interativa em `/api/docs`. Principais recursos:
 
 ### Testes
 
-São 82 testes em duas camadas, concentrados onde o risco está.
+São 114 testes — 82 no backend e 32 no frontend —, concentrados onde o risco está.
 
 **Regras de domínio (44).** Funções puras, testadas sem banco, sem framework e sem mock:
 
@@ -240,7 +264,14 @@ produção. Entre os casos cobertos:
 - fechamento recusado com dia inconsistente, homologação com ressalva, bloqueio de
   marcações no período fechado e reabertura privativa do RH.
 
-O acesso a dados é substituído por um repositório em memória
+**Frontend (32).** Formatação de duração e saldo, resolução de dia da semana sem depender
+do fuso do navegador, guarda de rota por papel, e o interceptor HTTP — que anexa o token
+apenas a chamadas da própria API e encerra a sessão quando o servidor a recusa. Na tela de
+marcação, verifica-se que só são oferecidas as marcações válidas para o estado atual da
+jornada, que nenhum horário é enviado pelo cliente, e que um turno em aberto consulta o dia
+da jornada em vez do dia de hoje.
+
+O acesso a dados do backend é substituído por um repositório em memória
 ([`test/support/in-memory-prisma.ts`](backend/test/support/in-memory-prisma.ts)), que
 implementa apenas as consultas usadas pela aplicação e falha explicitamente diante de
 qualquer outra — um duplo permissivo devolveria dados errados em silêncio. A troca
@@ -276,6 +307,11 @@ São escolhas de escopo, não descuidos — cada uma tem um caminho de evoluçã
   uma tabela de feriados por país consultada no cálculo da expectativa diária.
 - **Escala por dia da semana.** A carga esperada é um valor único por colaborador; jornadas
   6x1 ou meio período às sextas não são representáveis.
+- **Migração das planilhas atuais.** O cenário descreve um controle feito hoje em planilhas
+  compartilhadas, mas não há funcionalidade de importação. O modelo já prevê o caso — as
+  marcações têm origem `IMPORT`, distinta de um registro feito pelo colaborador —, de modo
+  que o histórico migrado não se confunde com o registrado na plataforma. Falta a rotina de
+  leitura da planilha e a conciliação, que dependem do formato real usado pela empresa.
 - **Hierarquia de um nível.** Gestor de gestor não enxerga a equipe estendida.
 - **Sem refresh token.** A sessão dura o tempo do access token (8h) e exige novo login.
 - **Testes contra o banco real.** Os testes de API rodam sobre um repositório em memória,
