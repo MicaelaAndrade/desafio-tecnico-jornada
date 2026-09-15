@@ -1,0 +1,84 @@
+<div class="ponto">
+  <mat-card class="cartao-principal">
+    @if (carregando() || registrando()) {
+      <mat-progress-bar mode="indeterminate" />
+    }
+
+    <mat-card-content>
+      <p class="relogio">{{ agora() | date: 'HH:mm:ss' }}</p>
+      <p class="data">{{ agora() | date: "EEEE, d 'de' MMMM" }}</p>
+
+      <div class="estado">
+        <mat-chip-set>
+          <mat-chip [highlighted]="status()?.state !== 'OFF_SHIFT'">
+            {{ rotuloEstado() }}
+          </mat-chip>
+          @if (status()?.state !== 'OFF_SHIFT') {
+            <mat-chip>Hoje: {{ formatar(totalTrabalhadoHoje()) }}</mat-chip>
+          }
+        </mat-chip-set>
+      </div>
+
+      <div class="local">
+        <mat-icon inline>public</mat-icon>
+        <span>{{ fuso() }}</span>
+        @if (emViagem()) {
+          <span class="aviso-viagem">
+            fora do seu fuso contratual — a marcação será registrada aqui
+          </span>
+        }
+      </div>
+
+      <mat-form-field appearance="outline" class="campo-pais">
+        <mat-label>País onde você está</mat-label>
+        <input
+          matInput
+          maxlength="2"
+          [ngModel]="pais()"
+          (ngModelChange)="pais.set(($event ?? '').toUpperCase())"
+        />
+        <mat-hint>Código de 2 letras (BR, PT, DE)</mat-hint>
+      </mat-form-field>
+
+      <div class="acoes">
+        @for (tipo of status()?.allowedNext ?? []; track tipo) {
+          <button
+            mat-flat-button
+            [color]="tipo === 'CLOCK_OUT' ? 'warn' : 'primary'"
+            [disabled]="registrando()"
+            (click)="registrar(tipo)"
+          >
+            <mat-icon>{{ iconeDoTipo(tipo) }}</mat-icon>
+            {{ rotuloDoTipo(tipo) }}
+          </button>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="cartao-marcacoes">
+    <mat-card-header>
+      <mat-card-title>
+        {{ status()?.openWorkDate ? 'Marcações da jornada em aberto' : 'Marcações de hoje' }}
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (marcacoesDeHoje().length === 0) {
+        <p class="vazio">Nenhuma marcação registrada ainda.</p>
+      } @else {
+        <mat-list>
+          @for (marcacao of marcacoesDeHoje(); track marcacao.id) {
+            <mat-list-item>
+              <mat-icon matListItemIcon>{{ iconeDoTipo(marcacao.type) }}</mat-icon>
+              <span matListItemTitle>{{ rotuloDoTipo(marcacao.type) }}</span>
+              <span matListItemLine>
+                {{ marcacao.localTime }} · {{ marcacao.timezone }} ({{ marcacao.countryCode }})
+              </span>
+            </mat-list-item>
+          }
+        </mat-list>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>
