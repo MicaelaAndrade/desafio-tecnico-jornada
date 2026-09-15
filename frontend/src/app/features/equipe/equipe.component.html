@@ -1,0 +1,95 @@
+<div class="equipe">
+  <mat-card>
+    @if (carregando()) {
+      <mat-progress-bar mode="indeterminate" />
+    }
+
+    <mat-card-content>
+      <header class="navegacao">
+        <button mat-icon-button (click)="mudarCompetencia(-1)" aria-label="Mês anterior">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <h1>{{ rotuloCompetencia() }}</h1>
+        <button mat-icon-button (click)="mudarCompetencia(1)" aria-label="Próximo mês">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </header>
+
+      <p class="contexto">
+        {{ membros().length }} colaborador(es) no seu escopo
+        @if (totalPendencias() > 0) {
+          · <strong>{{ totalPendencias() }} dia(s) com pendência</strong>
+        }
+      </p>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="lista">
+    @for (membro of membros(); track membro.userId) {
+      <mat-card class="membro">
+        <mat-card-content>
+          <div class="identificacao">
+            <div>
+              <strong>{{ membro.name }}</strong>
+              <p class="local">{{ membro.countryCode }} · {{ membro.baseTimezone }}</p>
+            </div>
+
+            <mat-chip-set>
+              <mat-chip [highlighted]="membro.closingStatus === 'CLOSED'">
+                {{ membro.closingStatus === 'CLOSED' ? 'Fechada' : 'Aberta' }}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+
+          <div class="numeros">
+            <div>
+              <span class="rotulo">Trabalhado</span>
+              <strong>{{ duracao(membro.workedMinutes) }}</strong>
+            </div>
+            <div>
+              <span class="rotulo">Esperado</span>
+              <strong>{{ duracao(membro.expectedMinutes) }}</strong>
+            </div>
+            <div>
+              <span class="rotulo">Saldo</span>
+              <strong
+                [class.negativo]="membro.balanceMinutes < 0"
+                [class.positivo]="membro.balanceMinutes > 0"
+                >{{ saldo(membro.balanceMinutes) }}</strong
+              >
+            </div>
+            <div>
+              <span class="rotulo">Pendências</span>
+              <strong [class.negativo]="membro.daysWithInconsistencies > 0">
+                {{ membro.daysWithInconsistencies }}
+              </strong>
+            </div>
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions align="end">
+          <button mat-button (click)="abrirEspelho(membro)">
+            <mat-icon>description</mat-icon>
+            Espelho
+          </button>
+
+          @if (auth.ehRh()) {
+            @if (membro.closingStatus === 'OPEN') {
+              <button mat-button color="primary" (click)="fechar(membro)">
+                <mat-icon>lock</mat-icon>
+                Fechar competência
+              </button>
+            } @else {
+              <button mat-button (click)="reabrir(membro)">
+                <mat-icon>lock_open</mat-icon>
+                Reabrir
+              </button>
+            }
+          }
+        </mat-card-actions>
+      </mat-card>
+    } @empty {
+      <p class="vazio">Nenhum colaborador no seu escopo.</p>
+    }
+  </div>
+</div>

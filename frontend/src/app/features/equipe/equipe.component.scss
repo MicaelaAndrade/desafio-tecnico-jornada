@@ -1,0 +1,79 @@
+.equipe {
+  display: grid;
+  gap: 1rem;
+  max-width: 60rem;
+  margin: 0 auto;
+}
+
+.navegacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h1 {
+    font-size: 1.125rem;
+    font-weight: 500;
+    margin: 0;
+    text-transform: capitalize;
+  }
+}
+
+.contexto {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  opacity: 0.75;
+  text-align: center;
+}
+
+.lista {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+}
+
+.identificacao {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  .local {
+    margin: 0.15rem 0 0;
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+}
+
+.numeros {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.875rem;
+
+  .rotulo {
+    display: block;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    opacity: 0.65;
+  }
+
+  strong {
+    font-size: 0.9375rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+  }
+}
+
+.positivo {
+  color: #1b7f4f;
+}
+
+.negativo {
+  color: #b3261e;
+}
+
+.vazio {
+  opacity: 0.6;
+  text-align: center;
+}
