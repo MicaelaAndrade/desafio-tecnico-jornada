@@ -58,9 +58,15 @@ não há configuração de CORS a fazer em desenvolvimento.
 
 ```bash
 cd backend
-npm test                # suíte completa
+npm test                # suíte completa — 82 testes
+npm run test:unit       # apenas as regras de domínio
+npm run test:api        # apenas os testes de API
 npm run test:cov        # com cobertura
 ```
+
+Nenhum teste exige banco de dados, Docker ou aplicação no ar: os testes de API sobem a
+aplicação NestJS de verdade e substituem apenas o acesso a dados por um repositório em
+memória. Rodam em qualquer ambiente e servem como porta de CI.
 
 ---
 
@@ -205,8 +211,9 @@ Documentação interativa em `/api/docs`. Principais recursos:
 
 ### Testes
 
-A cobertura foi concentrada onde o risco está: o cálculo da jornada e o tratamento de
-tempo. Entre os casos cobertos:
+São 82 testes em duas camadas, concentrados onde o risco está.
+
+**Regras de domínio (44).** Funções puras, testadas sem banco, sem framework e sem mock:
 
 - turno que cruza a meia-noite mantido como jornada única;
 - transição de horário de verão em Portugal — cinco horas reais contabilizadas onde o
@@ -216,6 +223,29 @@ tempo. Entre os casos cobertos:
   turno implausível);
 - a conversão entre o tipo `DATE` do banco e a data civil, que é a origem clássica do erro
   de "um dia a menos".
+
+**API (38).** A aplicação NestJS real é inicializada e exercitada por HTTP, com o mesmo
+pipeline de validação, os mesmos guards e as mesmas regras de acesso da execução em
+produção. Entre os casos cobertos:
+
+- o instante da marcação vem do servidor, e um `occurredAt` enviado pelo cliente faz a
+  requisição ser recusada;
+- o dia da jornada é atribuído pelo fuso do local da marcação, e uma jornada em aberto
+  mantém o mesmo dia nas marcações seguintes;
+- colaborador não lê jornada alheia, gestor só lê a própria equipe, RH lê todos — em cada
+  caso verificado pelo endpoint, não apenas pela rota;
+- o ciclo completo de correção: solicitação, recusa de auto-homologação, homologação pelo
+  gestor, efeito na folha, e a marcação revogada que some do cálculo mas permanece
+  auditável;
+- fechamento recusado com dia inconsistente, homologação com ressalva, bloqueio de
+  marcações no período fechado e reabertura privativa do RH.
+
+O acesso a dados é substituído por um repositório em memória
+([`test/support/in-memory-prisma.ts`](backend/test/support/in-memory-prisma.ts)), que
+implementa apenas as consultas usadas pela aplicação e falha explicitamente diante de
+qualquer outra — um duplo permissivo devolveria dados errados em silêncio. A troca
+mantém a suíte executável sem infraestrutura; o que ela não cobre são migrations,
+constraints e atomicidade real de transação, que dependem do PostgreSQL.
 
 ---
 
@@ -248,8 +278,10 @@ São escolhas de escopo, não descuidos — cada uma tem um caminho de evoluçã
   6x1 ou meio período às sextas não são representáveis.
 - **Hierarquia de um nível.** Gestor de gestor não enxerga a equipe estendida.
 - **Sem refresh token.** A sessão dura o tempo do access token (8h) e exige novo login.
-- **Testes end-to-end de API.** A cobertura atual é de testes unitários do domínio; os
-  fluxos HTTP não têm testes automatizados.
+- **Testes contra o banco real.** Os testes de API rodam sobre um repositório em memória,
+  o que os torna rápidos e independentes de infraestrutura, mas deixa de fora migrations,
+  constraints de integridade e atomicidade de transação. A evolução natural é uma segunda
+  suíte com PostgreSQL efêmero (Testcontainers), executada no CI.
 - **Desempenho em volume.** A folha de ponto lê os eventos do período e agrega em
   aplicação. É adequado para a ordem de grandeza do problema; em volume maior, o caminho
   é uma view materializada por competência.
