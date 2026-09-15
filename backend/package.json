@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "API de gestão de jornada de trabalho",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "scripts": {
     "build": "nest build",
     "start": "nest start",

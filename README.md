@@ -27,9 +27,19 @@ com as alternativas descartadas, está no [ADR-0001](docs/adr/0001-stack-tecnolo
 
 ## Como executar
 
-### Caminho rápido (Docker)
+### Requisitos
 
-Pré-requisito: Docker com Compose v2.
+| | |
+|---|---|
+| Node.js | **20.19+** ou **22.12+** — exigência do Angular 21 |
+| Docker | apenas para o caminho com banco |
+| PostgreSQL | 16, se optar por rodar sem Docker |
+
+Confira com `node -v` antes de começar. Versões anteriores instalam as dependências
+normalmente e só falham na hora de subir o frontend, com a mensagem
+`The Angular CLI requires a minimum Node.js version`.
+
+### Caminho rápido (Docker)
 
 ```bash
 git clone https://github.com/MicaelaAndrade/desafio-tecnico-jornada.git
@@ -63,7 +73,7 @@ transações não são exercitadas nesse modo. Para avaliar a persistência, use
 
 ### Execução local, sem Docker
 
-Requisitos: Node.js 22+ e uma instância de PostgreSQL 16.
+Além dos requisitos acima, é preciso uma instância de PostgreSQL 16 em execução.
 
 ```bash
 # Backend
