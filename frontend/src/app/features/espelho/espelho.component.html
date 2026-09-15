@@ -1,0 +1,132 @@
+<div class="espelho">
+  <mat-card class="resumo">
+    @if (carregando()) {
+      <mat-progress-bar mode="indeterminate" />
+    }
+
+    <mat-card-content>
+      <header class="navegacao">
+        <button mat-icon-button (click)="mudarCompetencia(-1)" aria-label="Mês anterior">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+
+        <div class="competencia">
+          <h1>{{ rotuloCompetencia() }}</h1>
+          @if (!ehPropriaJornada() && espelho()) {
+            <p class="colaborador">{{ espelho()!.userName }}</p>
+          }
+        </div>
+
+        <button mat-icon-button (click)="mudarCompetencia(1)" aria-label="Próximo mês">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </header>
+
+      @if (espelho(); as dados) {
+        <div class="totais">
+          <div class="total">
+            <span class="rotulo">Trabalhado</span>
+            <strong>{{ duracao(dados.workedMinutes) }}</strong>
+          </div>
+          <div class="total">
+            <span class="rotulo">Esperado</span>
+            <strong>{{ duracao(dados.expectedMinutes) }}</strong>
+          </div>
+          <div class="total">
+            <span class="rotulo">Saldo</span>
+            <strong [class.negativo]="dados.balanceMinutes < 0" [class.positivo]="dados.balanceMinutes > 0">
+              {{ saldo(dados.balanceMinutes) }}
+            </strong>
+          </div>
+        </div>
+
+        <div class="marcadores">
+          <mat-chip-set>
+            <mat-chip [highlighted]="dados.closingStatus === 'CLOSED'">
+              <mat-icon matChipAvatar>{{ dados.closingStatus === 'CLOSED' ? 'lock' : 'lock_open' }}</mat-icon>
+              {{ dados.closingStatus === 'CLOSED' ? 'Competência fechada' : 'Competência aberta' }}
+            </mat-chip>
+
+            @if (dados.daysWithInconsistencies > 0) {
+              <mat-chip (click)="alternarFiltro()" [highlighted]="apenasComPendencia()">
+                <mat-icon matChipAvatar>error_outline</mat-icon>
+                {{ dados.daysWithInconsistencies }} dia(s) com pendência
+              </mat-chip>
+            }
+          </mat-chip-set>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  @if (espelho()) {
+    <div class="dias" role="table">
+      <div class="linha cabecalho" role="row">
+        <span role="columnheader">Dia</span>
+        <span role="columnheader">Marcações</span>
+        <span role="columnheader">Trabalhado</span>
+        <span role="columnheader">Saldo</span>
+        <span role="columnheader"></span>
+      </div>
+
+      @for (dia of diasVisiveis(); track dia.workDate) {
+        <div
+          class="linha"
+          role="row"
+          [class.fim-de-semana]="fimDeSemana(dia.workDate)"
+          [class.com-pendencia]="pendencias(dia).length > 0"
+        >
+          <span class="dia-rotulo" role="cell">{{ rotuloDoDia(dia.workDate) }}</span>
+
+          <div class="marcacoes" role="cell">
+            @if (dia.entries.length === 0) {
+              <span class="sem-marcacao">—</span>
+            } @else {
+              @for (marcacao of dia.entries; track marcacao.id) {
+                <span
+                  class="marcacao"
+                  [class.manual]="marcacao.source !== 'WEB'"
+                  [matTooltip]="rotuloDoTipo(marcacao.type) + ' · ' + marcacao.timezone"
+                >
+                  {{ marcacao.localTime }}
+                </span>
+              }
+            }
+
+            @for (info of informativos(dia); track info.code) {
+              <mat-icon class="icone-info" [matTooltip]="info.message">flight_takeoff</mat-icon>
+            }
+          </div>
+
+          <span class="trabalhado" role="cell">{{ duracao(dia.workedMinutes) }}</span>
+
+          <span
+            class="saldo"
+            role="cell"
+            [class.negativo]="dia.balanceMinutes < 0"
+            [class.positivo]="dia.balanceMinutes > 0"
+          >
+            {{ saldo(dia.balanceMinutes) }}
+          </span>
+
+          <span class="acao" role="cell">
+            @if (pendencias(dia).length > 0) {
+              <mat-icon class="icone-pendencia" [matTooltip]="pendencias(dia)[0].message">
+                error_outline
+              </mat-icon>
+            }
+            @if (espelho()!.closingStatus === 'OPEN') {
+              <button
+                mat-icon-button
+                matTooltip="Solicitar correção"
+                (click)="solicitarCorrecao(dia)"
+              >
+                <mat-icon>edit_note</mat-icon>
+              </button>
+            }
+          </span>
+        </div>
+      }
+    </div>
+  }
+</div>
