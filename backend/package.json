@@ -13,6 +13,8 @@
     "prisma:deploy": "prisma migrate deploy",
     "prisma:seed": "ts-node prisma/seed.ts",
     "test": "jest",
+    "test:unit": "jest src",
+    "test:api": "jest test/api",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
