@@ -1,3 +1,5 @@
+import { paisDoFuso } from './localidade';
+
 /** Converte minutos em "8h 30m", preservando o sinal para saldos negativos. */
 export function formatarMinutos(minutos: number): string {
   const sinal = minutos < 0 ? '-' : '';
@@ -41,12 +43,20 @@ export function fusoDoDispositivo(): string {
 }
 
 /**
- * País inferido a partir do locale do navegador, usado como sugestão inicial.
- * O colaborador pode corrigir antes de confirmar a marcação.
+ * País sugerido como valor inicial do campo — o colaborador pode corrigir antes
+ * de confirmar a marcação.
+ *
+ * A ordem das fontes importa. O fuso do dispositivo diz onde o relógio está; o
+ * idioma diz apenas em que língua a pessoa configurou a máquina. Um brasileiro
+ * com o sistema em inglês tem `navigator.language = 'en-US'` sem nunca ter saído
+ * do país, e partir daí sugeriria `US` em toda marcação — além de errado, faria
+ * o aviso de divergência disparar sempre, que é como um aviso perde o sentido.
  */
-export function paisSugerido(): string {
-  const locale = navigator.language ?? 'pt-BR';
-  const regiao = locale.split('-')[1];
+export function paisSugerido(fuso = fusoDoDispositivo()): string {
+  const peloFuso = paisDoFuso(fuso);
+  if (peloFuso) return peloFuso;
+
+  const regiao = (navigator.language ?? 'pt-BR').split('-')[1];
   return (regiao ?? 'BR').toUpperCase().slice(0, 2);
 }
 

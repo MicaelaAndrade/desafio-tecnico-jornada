@@ -103,7 +103,7 @@ npm run test:unit       # apenas as regras de domínio
 npm run test:api        # apenas os testes de API
 npm run test:cov        # com cobertura
 
-# Frontend — 38 testes
+# Frontend — 61 testes
 cd ../frontend
 npm test -- --watch=false
 ```
@@ -168,6 +168,7 @@ com o contexto, a decisão, as consequências e as alternativas descartadas.
 | [0004](docs/adr/0004-estrategia-de-fuso-horario.md) | Estratégia de fuso horário |
 | [0005](docs/adr/0005-fechamento-mensal.md) | Fechamento mensal com ciclo de vida |
 | [0006](docs/adr/0006-papeis-e-escopo-de-visao.md) | Papéis e escopo de visão |
+| [0007](docs/adr/0007-coerencia-entre-pais-declarado-e-fuso.md) | Coerência entre país declarado e fuso detectado |
 
 As quatro decisões que mais moldam o sistema, em resumo:
 
@@ -259,7 +260,7 @@ Documentação interativa em `/api/docs`. Principais recursos:
 
 ### Testes
 
-São 124 testes — 86 no backend e 38 no frontend —, concentrados onde o risco está.
+São 147 testes — 86 no backend e 61 no frontend —, concentrados onde o risco está.
 
 **Regras de domínio (48).** Funções puras, testadas sem banco, sem framework e sem mock:
 

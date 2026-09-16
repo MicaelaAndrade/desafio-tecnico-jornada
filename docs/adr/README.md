@@ -15,6 +15,7 @@ documentação.
 | [0004](0004-estrategia-de-fuso-horario.md) | Estratégia de fuso horário | Trata operação internacional e colaboradores em viagem |
 | [0005](0005-fechamento-mensal.md) | Fechamento mensal | Ataca a dor de "inconsistências nos fechamentos" |
 | [0006](0006-papeis-e-escopo-de-visao.md) | Papéis e escopo de visão | Colaborador / gestor / RH + minimização de acesso (GDPR) |
+| [0007](0007-coerencia-entre-pais-declarado-e-fuso.md) | País declarado × fuso detectado | Avisar sem bloquear: o sistema não recusa jornada que aconteceu |
 
 ## Premissas assumidas
 
@@ -34,3 +35,6 @@ Consolidadas aqui por conveniência; o detalhamento está em cada ADR.
    e saldo em relação ao esperado, deixando a política de remuneração para a folha.
 7. A hierarquia de gestão tem um nível (gestor → subordinado direto).
 8. Não há multi-tenancy: a instância atende uma empresa.
+9. O país informado na marcação é declaração do colaborador e não participa de cálculo. Se
+   contradisser o fuso do dispositivo, a plataforma avisa antes de gravar, mas registra o que
+   foi declarado — nunca recusa nem corrige por conta própria.

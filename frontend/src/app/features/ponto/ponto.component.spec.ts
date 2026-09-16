@@ -126,4 +126,56 @@ describe('PontoComponent', () => {
     expect(texto).toContain('Europe/Lisbon');
     expect(texto).toContain('PT');
   });
+
+  describe('país declarado × fuso detectado', () => {
+    // O fuso é fixado no teste em vez de lido do ambiente: o resultado não pode
+    // depender do relógio da máquina que roda a suíte.
+    async function comLocal(fuso: string, pais: string): Promise<PontoComponent> {
+      await montar({ state: 'OFF_SHIFT', allowedNext: ['CLOCK_IN'] });
+
+      const componente = fixture.componentInstance;
+      componente.fuso.set(fuso);
+      componente.pais.set(pais);
+      fixture.detectChanges();
+
+      return componente;
+    }
+
+    it('avisa quando o país declarado contradiz o fuso', async () => {
+      const componente = await comLocal('America/Sao_Paulo', 'DE');
+
+      expect(componente.divergenciaDeLocal()).toBe(true);
+      expect(fixture.nativeElement.querySelector('.aviso-divergencia')).not.toBeNull();
+      expect(fixture.nativeElement.textContent).toContain('America/Sao_Paulo');
+    });
+
+    // O ponto da decisão: avisar sem impedir. Uma jornada que aconteceu de fato
+    // não pode deixar de ser registrada por causa de um palpite de geografia.
+    it('não bloqueia o registro apesar do aviso', async () => {
+      await comLocal('America/Sao_Paulo', 'DE');
+
+      const botao = fixture.nativeElement.querySelector('.acoes button') as HTMLButtonElement;
+      expect(botao.disabled).toBe(false);
+
+      botao.click();
+
+      const enviado = jornada.registrarMarcacao.calls.mostRecent().args[0];
+      expect(enviado.countryCode).toBe('DE');
+      expect(enviado.timezone).toBe('America/Sao_Paulo');
+    });
+
+    it('não avisa quando o país é o do próprio fuso', async () => {
+      const componente = await comLocal('Europe/Lisbon', 'PT');
+
+      expect(componente.divergenciaDeLocal()).toBe(false);
+      expect(fixture.nativeElement.querySelector('.aviso-divergencia')).toBeNull();
+    });
+
+    it('não avisa sobre fuso fora do mapa de localidades', async () => {
+      const componente = await comLocal('Asia/Tokyo', 'BR');
+
+      expect(componente.paisSugeridoPeloFuso()).toBeNull();
+      expect(componente.divergenciaDeLocal()).toBe(false);
+    });
+  });
 });

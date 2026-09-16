@@ -48,6 +48,17 @@
         <mat-hint>Código de 2 letras (BR, PT, DE)</mat-hint>
       </mat-form-field>
 
+      @if (divergenciaDeLocal()) {
+        <p class="aviso-divergencia">
+          <mat-icon inline>help_outline</mat-icon>
+          <span>
+            Seu dispositivo indica <strong>{{ paisSugeridoPeloFuso() }}</strong> ({{ fuso() }}), mas
+            você declarou <strong>{{ pais() }}</strong
+            >. A marcação será registrada assim mesmo — confira se o país está certo.
+          </span>
+        </p>
+      }
+
       <div class="acoes">
         @for (tipo of status()?.allowedNext ?? []; track tipo) {
           <button

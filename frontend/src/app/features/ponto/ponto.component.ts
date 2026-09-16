@@ -19,6 +19,7 @@ import {
 import { AuthService } from '../../core/services/auth.service';
 import { JornadaService } from '../../core/services/jornada.service';
 import { formatarMinutos, fusoDoDispositivo, paisSugerido } from '../../core/utils/format';
+import { divergeDoFuso, paisDoFuso } from '../../core/utils/localidade';
 
 const ROTULO_ESTADO: Record<ShiftStatus['state'], string> = {
   OFF_SHIFT: 'Fora da jornada',
@@ -67,6 +68,22 @@ export class PontoComponent implements OnInit, OnDestroy {
   });
 
   readonly emViagem = computed(() => this.fuso() !== this.auth.usuario()?.baseTimezone);
+
+  /**
+   * País que o fuso detectado sugere — usado só para avisar, nunca para corrigir
+   * sozinho o que o colaborador declarou.
+   */
+  readonly paisSugeridoPeloFuso = computed(() => paisDoFuso(this.fuso()));
+
+  /**
+   * Divergência entre o país declarado e o fuso do dispositivo.
+   *
+   * Avisa, não bloqueia: fuso e país não têm relação de um para um, e há motivos
+   * legítimos para discordarem — VPN, relógio do sistema errado, escala em
+   * aeroporto. Impedir o registro de uma jornada que de fato aconteceu seria o
+   * pior desfecho possível; a pessoa trabalhou, o sistema tem que aceitar.
+   */
+  readonly divergenciaDeLocal = computed(() => divergeDoFuso(this.fuso(), this.pais()));
 
   /** Uma jornada aberta em dia anterior é pendência, não expediente em andamento. */
   readonly jornadaAbertaEHoje = computed(() => {
