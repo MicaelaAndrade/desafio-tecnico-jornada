@@ -20,15 +20,17 @@
       </div>
 
       @if (jornadaAbertaDeOutroDia()) {
-        <p class="aviso-pendencia">
-          <mat-icon inline>error_outline</mat-icon>
-          Há uma jornada de {{ status()?.openWorkDate }} sem registro de saída. Encerre-a ou
-          solicite correção no espelho de ponto.
+        <p class="aviso aviso-pendencia">
+          <mat-icon>error_outline</mat-icon>
+          <span>
+            Há uma jornada de {{ status()?.openWorkDate }} sem registro de saída. Encerre-a ou
+            solicite correção no espelho de ponto.
+          </span>
         </p>
       }
 
       <div class="local">
-        <mat-icon inline>public</mat-icon>
+        <mat-icon>public</mat-icon>
         <span>{{ fuso() }}</span>
         @if (emViagem()) {
           <span class="aviso-viagem">
@@ -49,12 +51,15 @@
       </mat-form-field>
 
       @if (divergenciaDeLocal()) {
-        <p class="aviso-divergencia">
-          <mat-icon inline>help_outline</mat-icon>
+        <p class="aviso aviso-divergencia">
+          <mat-icon>help_outline</mat-icon>
           <span>
             Seu dispositivo indica <strong>{{ paisSugeridoPeloFuso() }}</strong> ({{ fuso() }}), mas
             você declarou <strong>{{ pais() }}</strong
-            >. A marcação será registrada assim mesmo — confira se o país está certo.
+            >.
+            <span class="complemento">
+              A marcação será registrada assim mesmo — confira se o país está certo.
+            </span>
           </span>
         </p>
       }

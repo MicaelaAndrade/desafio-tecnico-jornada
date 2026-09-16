@@ -35,10 +35,18 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0.35rem;
+  gap: 0.375rem;
   font-size: 0.8125rem;
   opacity: 0.75;
   margin-bottom: 0.75rem;
+
+  // Tamanho explícito pelo mesmo motivo dos avisos: herdando o do texto, o
+  // glifo do ícone é renderizado cortado.
+  mat-icon {
+    font-size: 1.0625rem;
+    width: 1.0625rem;
+    height: 1.0625rem;
+  }
 }
 
 .aviso-viagem {
@@ -48,34 +56,56 @@
   opacity: 1;
 }
 
-// Divergência entre país declarado e fuso detectado não é erro — é uma pergunta.
-// Por isso âmbar, e não a cor de erro: o registro segue normalmente.
-.aviso-divergencia {
+// Forma comum dos avisos da tela. O ícone tem tamanho próprio e não herda o do
+// texto: com `inline` ele encolhia junto e saía cortado. `flex: none` impede que
+// o texto o comprima quando a mensagem é longa.
+.aviso {
   display: flex;
   align-items: flex-start;
-  gap: 0.35rem;
-  margin: -0.5rem 0 0.75rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
-  background: rgb(176 120 0 / 10%);
-  color: #8a5d00;
-  font-size: 0.8125rem;
+  gap: 0.625rem;
+  margin: 1rem 0;
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid transparent;
+  font-size: 0.875rem;
+  line-height: 1.5;
   text-align: left;
-  line-height: 1.35;
+
+  mat-icon {
+    flex: none;
+    font-size: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    // Alinha o centro óptico do ícone com a primeira linha do texto.
+    margin-top: 0.0625rem;
+  }
+
+  strong {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  // Segunda frase em tom menor: o que aconteceu vem primeiro, a instrução depois.
+  .complemento {
+    display: block;
+    margin-top: 0.125rem;
+    opacity: 0.85;
+  }
 }
 
+// Pendência é erro: jornada aberta sem saída precisa de ação.
 .aviso-pendencia {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  margin: 0 0 0.75rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
-  background: color-mix(in srgb, var(--mat-sys-error, #b3261e) 10%, transparent);
+  background: color-mix(in srgb, var(--mat-sys-error, #b3261e) 8%, transparent);
+  border-color: color-mix(in srgb, var(--mat-sys-error, #b3261e) 25%, transparent);
   color: var(--mat-sys-error, #b3261e);
-  font-size: 0.8125rem;
-  text-align: left;
+}
+
+// Divergência entre país declarado e fuso detectado não é erro — é pergunta.
+// Por isso âmbar, e não a cor de erro: o registro segue normalmente.
+.aviso-divergencia {
+  background: rgb(176 120 0 / 8%);
+  border-color: rgb(176 120 0 / 28%);
+  color: #7a5200;
 }
 
 .campo-pais {
