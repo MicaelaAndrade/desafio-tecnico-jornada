@@ -18,6 +18,13 @@ COPY . .
 
 RUN npx prisma generate && npm run build
 
+# O bit de execução é definido aqui, e não confiado ao checkout: o Git preserva
+# a permissão, mas o arquivo pode chegar por zip, por Windows ou por um volume
+# montado, e aí `permission denied` no start seria o sintoma.
+RUN chmod +x docker-entrypoint.sh
+
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed && node dist/main"]
+# A inicialização mora no script porque precisa esperar o banco e decidir o que
+# fazer quando o seed falha — lógica que não cabe numa linha encadeada com `&&`.
+CMD ["./docker-entrypoint.sh"]

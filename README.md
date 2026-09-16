@@ -48,7 +48,16 @@ docker compose up --build
 ```
 
 Na primeira execução o banco é criado, as migrations são aplicadas e a carga de
-demonstração é inserida automaticamente.
+demonstração é inserida automaticamente. A API espera o PostgreSQL ficar
+disponível antes de aplicar as migrations — na primeira subida o Postgres
+reinicia depois do `initdb`, e sem essa espera a conexão seria recusada.
+
+Se quiser recomeçar do zero, `docker compose down -v` remove o volume do banco
+junto. Para reinserir apenas a carga de demonstração, sem derrubar nada:
+
+```bash
+docker compose exec api npx prisma db seed
+```
 
 | Serviço | Endereço |
 |---|---|
