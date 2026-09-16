@@ -49,11 +49,12 @@
   }
 }
 
+// Mesma razão do negrito nos avisos: colorido e em peso maior, a linha gritava
+// mais que o próprio relógio. É informação de contexto, não chamada de ação.
 .aviso-viagem {
   flex-basis: 100%;
   color: var(--mat-sys-tertiary, #6750a4);
-  font-weight: 500;
-  opacity: 1;
+  opacity: 0.9;
 }
 
 // Forma comum dos avisos da tela. O ícone tem tamanho próprio e não herda o do
@@ -80,8 +81,11 @@
     margin-top: 0.0625rem;
   }
 
+  // Peso 500, não negrito. Sobre o fundo colorido do aviso, 600 engrossa demais
+  // o traço e a cor fica lavada — as duas localidades são o que se procura na
+  // frase, e destacá-las só pelo tom já basta.
   strong {
-    font-weight: 600;
+    font-weight: 500;
     white-space: nowrap;
   }
 
@@ -103,9 +107,19 @@
 // Divergência entre país declarado e fuso detectado não é erro — é pergunta.
 // Por isso âmbar, e não a cor de erro: o registro segue normalmente.
 .aviso-divergencia {
-  background: rgb(176 120 0 / 8%);
-  border-color: rgb(176 120 0 / 28%);
-  color: #7a5200;
+  background: rgb(176 120 0 / 7%);
+  border-color: rgb(176 120 0 / 25%);
+  // Texto quase neutro: o âmbar já está no fundo e na borda. Repeti-lo na letra
+  // reduzia o contraste e deixava a leitura amarelada.
+  color: #3f3a30;
+
+  strong {
+    color: #6b4700;
+  }
+
+  .complemento {
+    opacity: 0.75;
+  }
 }
 
 .campo-pais {

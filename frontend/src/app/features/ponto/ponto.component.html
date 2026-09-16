@@ -31,9 +31,7 @@
 
       <div class="local">
         <mat-icon>public</mat-icon>
-        <span
-          >Fuso do seu dispositivo: <strong>{{ fuso() }}</strong></span
-        >
+        <span>Fuso do seu dispositivo: {{ fuso() }}</span>
         @if (emViagem()) {
           <span class="aviso-viagem">
             fora do seu fuso contratual — a marcação será registrada aqui
