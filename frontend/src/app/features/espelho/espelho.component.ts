@@ -24,6 +24,14 @@ import {
 } from '../../core/utils/format';
 import { SolicitarCorrecaoDialog } from './solicitar-correcao.dialog';
 
+/** Só colunas com valor comparável; "Marcações" é uma lista, não tem ordem natural. */
+export type ColunaOrdenavel = 'workDate' | 'workedMinutes' | 'balanceMinutes';
+
+export interface Ordenacao {
+  coluna: ColunaOrdenavel;
+  direcao: 'asc' | 'desc';
+}
+
 @Component({
   selector: 'app-espelho',
   imports: [
@@ -60,11 +68,64 @@ export class EspelhoComponent implements OnInit {
     return !alvo || alvo === this.auth.usuario()?.id;
   });
 
+  /**
+   * Ordenação da tabela.
+   *
+   * O padrão é dia crescente, que é como um espelho de ponto é lido e conferido.
+   * Mas quem usa a tela no dia a dia quer o dia de hoje, que fica no fim do mês —
+   * um clique em "Dia" inverte e traz o mais recente para o topo.
+   */
+  readonly ordenacao = signal<Ordenacao>({ coluna: 'workDate', direcao: 'asc' });
+
+  /**
+   * Dia de hoje no fuso contratual do colaborador — não no fuso do navegador.
+   * Quem consulta a jornada de um colega em outro país precisa ver o "hoje" dele.
+   */
+  private readonly hojeDoColaborador = computed(() =>
+    new Intl.DateTimeFormat('en-CA', {
+      timeZone: this.espelho()?.baseTimezone ?? this.auth.usuario()?.baseTimezone ?? 'UTC',
+    }).format(new Date()),
+  );
+
+  /**
+   * Dias do mês que ainda não aconteceram.
+   *
+   * Não têm marcação, não geram expectativa e não entram no saldo: só ocupam a
+   * tela. Na competência corrente eles ficam ocultos por padrão — sem isso, ver
+   * o dia mais recente primeiro ainda exigiria rolar por duas semanas vazias.
+   */
+  readonly diasFuturos = computed(
+    () =>
+      (this.espelho()?.days ?? []).filter((dia) => dia.workDate > this.hojeDoColaborador()).length,
+  );
+
+  readonly mostrarFuturos = signal(false);
+
   readonly diasVisiveis = computed(() => {
     const dias = this.espelho()?.days ?? [];
-    return this.apenasComPendencia()
-      ? dias.filter((dia) => dia.inconsistencies.some((i) => i.severity !== 'INFO'))
-      : dias;
+
+    const ateHoje =
+      this.mostrarFuturos() || this.diasFuturos() === 0
+        ? dias
+        : dias.filter((dia) => dia.workDate <= this.hojeDoColaborador());
+
+    const filtrados = this.apenasComPendencia()
+      ? ateHoje.filter((dia) => dia.inconsistencies.some((i) => i.severity !== 'INFO'))
+      : ateHoje;
+
+    const { coluna, direcao } = this.ordenacao();
+    const sentido = direcao === 'asc' ? 1 : -1;
+
+    // Cópia: o array vem do signal do espelho e ordenar no lugar mutaria o estado.
+    return [...filtrados].sort((a, b) => {
+      // Datas ISO ordenam cronologicamente como texto, então não há Date aqui.
+      const diferenca =
+        coluna === 'workDate' ? a.workDate.localeCompare(b.workDate) : a[coluna] - b[coluna];
+
+      // Empate (dias com o mesmo saldo, por exemplo) volta à ordem cronológica,
+      // para a tabela não embaralhar linhas equivalentes a cada clique.
+      return diferenca !== 0 ? diferenca * sentido : a.workDate.localeCompare(b.workDate);
+    });
   });
 
   ngOnInit(): void {
@@ -89,6 +150,36 @@ export class EspelhoComponent implements OnInit {
 
   alternarFiltro(): void {
     this.apenasComPendencia.update((valor) => !valor);
+  }
+
+  alternarFuturos(): void {
+    this.mostrarFuturos.update((valor) => !valor);
+  }
+
+  /**
+   * Clicar na coluna já ativa inverte o sentido; clicar em outra começa crescente,
+   * exceto nas colunas numéricas, onde o interesse costuma ser o maior valor
+   * (mais horas trabalhadas, maior saldo) e começar por ele poupa um clique.
+   */
+  ordenarPor(coluna: ColunaOrdenavel): void {
+    this.ordenacao.update((atual) =>
+      atual.coluna === coluna
+        ? { coluna, direcao: atual.direcao === 'asc' ? 'desc' : 'asc' }
+        : { coluna, direcao: coluna === 'workDate' ? 'asc' : 'desc' },
+    );
+  }
+
+  /** Valor de `aria-sort`: leitores de tela anunciam a coluna ativa e o sentido. */
+  sentidoAria(coluna: ColunaOrdenavel): 'ascending' | 'descending' | 'none' {
+    const atual = this.ordenacao();
+    if (atual.coluna !== coluna) return 'none';
+    return atual.direcao === 'asc' ? 'ascending' : 'descending';
+  }
+
+  iconeOrdenacao(coluna: ColunaOrdenavel): string {
+    const atual = this.ordenacao();
+    if (atual.coluna !== coluna) return 'unfold_more';
+    return atual.direcao === 'asc' ? 'arrow_upward' : 'arrow_downward';
   }
 
   solicitarCorrecao(dia: DailyTimesheet): void {

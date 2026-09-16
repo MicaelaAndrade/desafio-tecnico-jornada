@@ -58,6 +58,17 @@
                 {{ dados.daysWithInconsistencies }} dia(s) com pendência
               </mat-chip>
             }
+
+            @if (diasFuturos() > 0) {
+              <mat-chip (click)="alternarFuturos()" [highlighted]="mostrarFuturos()">
+                <mat-icon matChipAvatar>event_upcoming</mat-icon>
+                {{
+                  mostrarFuturos()
+                    ? 'Ocultar ' + diasFuturos() + ' dia(s) por vir'
+                    : diasFuturos() + ' dia(s) por vir'
+                }}
+              </mat-chip>
+            }
           </mat-chip-set>
         </div>
       }
@@ -67,10 +78,35 @@
   @if (espelho()) {
     <div class="dias" role="table">
       <div class="linha cabecalho" role="row">
-        <span role="columnheader">Dia</span>
-        <span role="columnheader">Marcações</span>
-        <span role="columnheader">Trabalhado</span>
-        <span role="columnheader">Saldo</span>
+        <span role="columnheader" [attr.aria-sort]="sentidoAria('workDate')">
+          <button type="button" class="ordenar" (click)="ordenarPor('workDate')">
+            Dia
+            <mat-icon [class.inativo]="ordenacao().coluna !== 'workDate'">
+              {{ iconeOrdenacao('workDate') }}
+            </mat-icon>
+          </button>
+        </span>
+
+        <span role="columnheader" class="sem-ordenacao">Marcações</span>
+
+        <span role="columnheader" [attr.aria-sort]="sentidoAria('workedMinutes')">
+          <button type="button" class="ordenar" (click)="ordenarPor('workedMinutes')">
+            Trabalhado
+            <mat-icon [class.inativo]="ordenacao().coluna !== 'workedMinutes'">
+              {{ iconeOrdenacao('workedMinutes') }}
+            </mat-icon>
+          </button>
+        </span>
+
+        <span role="columnheader" [attr.aria-sort]="sentidoAria('balanceMinutes')">
+          <button type="button" class="ordenar" (click)="ordenarPor('balanceMinutes')">
+            Saldo
+            <mat-icon [class.inativo]="ordenacao().coluna !== 'balanceMinutes'">
+              {{ iconeOrdenacao('balanceMinutes') }}
+            </mat-icon>
+          </button>
+        </span>
+
         <span role="columnheader"></span>
       </div>
 

@@ -78,6 +78,8 @@ export interface DailyTimesheet {
 export interface MonthlyTimesheet {
   userId: string;
   userName: string;
+  /** Fuso contratual do colaborador consultado, não o de quem consulta. */
+  baseTimezone: string;
   year: number;
   month: number;
   days: DailyTimesheet[];

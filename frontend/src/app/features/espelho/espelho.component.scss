@@ -103,6 +103,48 @@
   }
 }
 
+// Cabeçalho clicável: é um <button> de verdade, para funcionar por teclado e ser
+// anunciado como controle. O estilo remove a aparência de botão e mantém a do
+// cabeçalho — a affordance vem da seta e do hover.
+.ordenar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.15rem 0.25rem;
+  margin-left: -0.25rem;
+  border: none;
+  border-radius: 0.25rem;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+
+  &:hover,
+  &:focus-visible {
+    background: rgb(0 0 0 / 7%);
+  }
+
+  mat-icon {
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
+
+    // A seta da coluna inativa só aparece no hover, para o cabeçalho não virar
+    // uma fileira de setas competindo por atenção.
+    &.inativo {
+      opacity: 0;
+      transition: opacity 120ms;
+    }
+  }
+
+  &:hover mat-icon.inativo,
+  &:focus-visible mat-icon.inativo {
+    opacity: 0.5;
+  }
+}
+
 .dia-rotulo {
   text-transform: capitalize;
 }
@@ -168,9 +210,25 @@
     row-gap: 0.35rem;
     padding: 0.75rem;
 
+    // No celular a tabela vira blocos e os rótulos de coluna perdem sentido, mas
+    // a ordenação não: é justamente na tela pequena que percorrer o mês inteiro
+    // custa mais. O cabeçalho sobrevive como uma faixa só com os controles.
     &.cabecalho {
-      display: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      padding: 0.5rem 0.5rem 0.5rem 0.25rem;
+
+      .sem-ordenacao,
+      [role='columnheader']:empty {
+        display: none;
+      }
     }
+  }
+
+  .ordenar mat-icon.inativo {
+    // Sem hover no toque, a seta precisa estar sempre visível.
+    opacity: 0.35;
   }
 
   .dia-rotulo {

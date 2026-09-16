@@ -70,6 +70,11 @@ export class DailyTimesheetDto {
 export class MonthlyTimesheetDto {
   @ApiProperty() userId!: string;
   @ApiProperty() userName!: string;
+  /**
+   * Fuso contratual de quem a jornada pertence — não de quem consulta. Um gestor
+   * no Brasil vendo a folha de um colaborador em Lisboa precisa do "hoje" dele.
+   */
+  @ApiProperty({ example: 'America/Sao_Paulo' }) baseTimezone!: string;
   @ApiProperty() year!: number;
   @ApiProperty() month!: number;
   @ApiProperty({ type: [DailyTimesheetDto] }) days!: DailyTimesheetDto[];

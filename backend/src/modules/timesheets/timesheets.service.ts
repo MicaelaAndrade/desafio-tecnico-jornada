@@ -67,6 +67,7 @@ export class TimesheetsService {
     return {
       userId: user.id,
       userName: user.name,
+      baseTimezone: user.baseTimezone,
       year,
       month,
       days: monthly.days.map((day) => this.toDailyDto(day, rowsById)),
