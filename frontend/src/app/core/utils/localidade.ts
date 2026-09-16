@@ -60,9 +60,46 @@ const PAIS_POR_FUSO: Readonly<Record<string, string>> = {
   'Europe/Zurich': 'CH',
 };
 
+/**
+ * Nome por extenso dos países da operação.
+ *
+ * Existe para o texto da tela: "DE" só é evidente para quem já conhece a tabela
+ * ISO, e o campo é preenchido por quem está batendo o ponto, não por quem
+ * mantém o sistema. Um país fora desta lista continua aceito — apenas aparece
+ * pela sigla, sem nome.
+ */
+const NOME_POR_PAIS: Readonly<Record<string, string>> = {
+  AT: 'Áustria',
+  BE: 'Bélgica',
+  BR: 'Brasil',
+  CH: 'Suíça',
+  CZ: 'Tchéquia',
+  DE: 'Alemanha',
+  DK: 'Dinamarca',
+  ES: 'Espanha',
+  FI: 'Finlândia',
+  FR: 'França',
+  GB: 'Reino Unido',
+  GR: 'Grécia',
+  HU: 'Hungria',
+  IE: 'Irlanda',
+  IT: 'Itália',
+  NL: 'Países Baixos',
+  NO: 'Noruega',
+  PL: 'Polônia',
+  PT: 'Portugal',
+  RO: 'Romênia',
+  SE: 'Suécia',
+};
+
 /** País correspondente ao fuso, ou `null` quando não há opinião a respeito. */
 export function paisDoFuso(fuso: string): string | null {
   return PAIS_POR_FUSO[fuso] ?? null;
+}
+
+/** Nome por extenso do país, ou `null` quando a sigla não é conhecida. */
+export function nomeDoPais(pais: string): string | null {
+  return NOME_POR_PAIS[pais.trim().toUpperCase()] ?? null;
 }
 
 /**

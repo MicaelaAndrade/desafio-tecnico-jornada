@@ -31,7 +31,9 @@
 
       <div class="local">
         <mat-icon>public</mat-icon>
-        <span>{{ fuso() }}</span>
+        <span
+          >Fuso do seu dispositivo: <strong>{{ fuso() }}</strong></span
+        >
         @if (emViagem()) {
           <span class="aviso-viagem">
             fora do seu fuso contratual — a marcação será registrada aqui
@@ -47,18 +49,31 @@
           [ngModel]="pais()"
           (ngModelChange)="pais.set(($event ?? '').toUpperCase())"
         />
-        <mat-hint>Código de 2 letras (BR, PT, DE)</mat-hint>
+        @if (nomeDoPaisDigitado(); as nome) {
+          <mat-hint>{{ nome }}</mat-hint>
+        } @else {
+          <mat-hint>
+            Sigla de 2 letras — BR para Brasil, PT para Portugal, DE para Alemanha
+          </mat-hint>
+        }
       </mat-form-field>
 
       @if (divergenciaDeLocal()) {
         <p class="aviso aviso-divergencia">
           <mat-icon>help_outline</mat-icon>
           <span>
-            Seu dispositivo indica <strong>{{ paisSugeridoPeloFuso() }}</strong> ({{ fuso() }}), mas
-            você declarou <strong>{{ pais() }}</strong
+            <!--
+              As duas localidades são apostos, nunca regidas por preposição: "no
+              Brasil" e "em Portugal" pedem artigos diferentes, e o nome do país
+              aqui é variável. "aponta X" funciona para todos.
+            -->
+            O relógio deste dispositivo aponta
+            <strong>{{ nomeDoPaisDoFuso() ?? paisSugeridoPeloFuso() }}</strong
+            >; você informou <strong>{{ nomeDoPaisDigitado() ?? pais() }}</strong
             >.
             <span class="complemento">
-              A marcação será registrada assim mesmo — confira se o país está certo.
+              Se for esse o seu local, pode registrar normalmente. Se foi engano, corrija antes de
+              marcar — depois de registrada, a marcação só muda por solicitação de correção.
             </span>
           </span>
         </p>

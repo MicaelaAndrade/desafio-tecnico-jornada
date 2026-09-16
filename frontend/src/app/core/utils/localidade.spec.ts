@@ -1,5 +1,5 @@
 import { paisSugerido } from './format';
-import { divergeDoFuso, paisDoFuso } from './localidade';
+import { divergeDoFuso, nomeDoPais, paisDoFuso } from './localidade';
 
 describe('localidade', () => {
   describe('paisDoFuso', () => {
@@ -42,6 +42,30 @@ describe('localidade', () => {
     it('compara sem depender de caixa ou espaço', () => {
       expect(divergeDoFuso('America/Sao_Paulo', ' br ')).toBe(false);
       expect(divergeDoFuso('America/Sao_Paulo', ' de ')).toBe(true);
+    });
+  });
+
+  describe('nomeDoPais', () => {
+    it('traduz a sigla para o nome por extenso', () => {
+      expect(nomeDoPais('DE')).toBe('Alemanha');
+      expect(nomeDoPais('BR')).toBe('Brasil');
+      expect(nomeDoPais('PT')).toBe('Portugal');
+    });
+
+    it('aceita a sigla como o campo a entrega, sem caixa nem espaço', () => {
+      expect(nomeDoPais(' de ')).toBe('Alemanha');
+    });
+
+    // Sigla desconhecida não impede o registro: a tela mostra a própria sigla.
+    it('devolve nulo para sigla fora da lista', () => {
+      expect(nomeDoPais('XX')).toBeNull();
+      expect(nomeDoPais('')).toBeNull();
+    });
+
+    it('nomeia todo país que algum fuso do mapa aponta', () => {
+      for (const fuso of ['America/Sao_Paulo', 'Europe/Lisbon', 'Europe/Berlin', 'Europe/Oslo']) {
+        expect(nomeDoPais(paisDoFuso(fuso)!)).not.toBeNull();
+      }
     });
   });
 

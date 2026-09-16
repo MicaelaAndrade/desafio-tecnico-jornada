@@ -146,7 +146,39 @@ describe('PontoComponent', () => {
 
       expect(componente.divergenciaDeLocal()).toBe(true);
       expect(fixture.nativeElement.querySelector('.aviso-divergencia')).not.toBeNull();
-      expect(fixture.nativeElement.textContent).toContain('America/Sao_Paulo');
+    });
+
+    // O texto fala em países, não em siglas: quem bate o ponto não tem obrigação
+    // de saber que DE é Alemanha.
+    it('nomeia os dois países por extenso no aviso', async () => {
+      await comLocal('America/Sao_Paulo', 'DE');
+
+      const aviso = fixture.nativeElement.querySelector('.aviso-divergencia') as HTMLElement;
+      expect(aviso.textContent).toContain('Brasil');
+      expect(aviso.textContent).toContain('Alemanha');
+    });
+
+    // Sigla fora da lista de nomes ainda precisa produzir uma frase legível.
+    it('recai na sigla quando o país não tem nome conhecido', async () => {
+      await comLocal('America/Sao_Paulo', 'XX');
+
+      const aviso = fixture.nativeElement.querySelector('.aviso-divergencia') as HTMLElement;
+      expect(aviso.textContent).toContain('Brasil');
+      expect(aviso.textContent).toContain('XX');
+    });
+
+    it('confirma o país na dica do campo enquanto a pessoa digita', async () => {
+      await comLocal('America/Sao_Paulo', 'PT');
+
+      const dica = fixture.nativeElement.querySelector('.campo-pais mat-hint') as HTMLElement;
+      expect(dica.textContent?.trim()).toBe('Portugal');
+    });
+
+    it('mostra a instrução na dica enquanto a sigla não é reconhecida', async () => {
+      await comLocal('America/Sao_Paulo', 'X');
+
+      const dica = fixture.nativeElement.querySelector('.campo-pais mat-hint') as HTMLElement;
+      expect(dica.textContent).toContain('BR para Brasil');
     });
 
     // O ponto da decisão: avisar sem impedir. Uma jornada que aconteceu de fato

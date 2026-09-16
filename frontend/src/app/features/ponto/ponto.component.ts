@@ -19,7 +19,7 @@ import {
 import { AuthService } from '../../core/services/auth.service';
 import { JornadaService } from '../../core/services/jornada.service';
 import { formatarMinutos, fusoDoDispositivo, paisSugerido } from '../../core/utils/format';
-import { divergeDoFuso, paisDoFuso } from '../../core/utils/localidade';
+import { divergeDoFuso, nomeDoPais, paisDoFuso } from '../../core/utils/localidade';
 
 const ROTULO_ESTADO: Record<ShiftStatus['state'], string> = {
   OFF_SHIFT: 'Fora da jornada',
@@ -74,6 +74,14 @@ export class PontoComponent implements OnInit, OnDestroy {
    * sozinho o que o colaborador declarou.
    */
   readonly paisSugeridoPeloFuso = computed(() => paisDoFuso(this.fuso()));
+
+  /** "Alemanha" para DE — `null` quando a sigla digitada não é conhecida. */
+  readonly nomeDoPaisDigitado = computed(() => nomeDoPais(this.pais()));
+
+  readonly nomeDoPaisDoFuso = computed(() => {
+    const sigla = this.paisSugeridoPeloFuso();
+    return sigla ? nomeDoPais(sigla) : null;
+  });
 
   /**
    * Divergência entre o país declarado e o fuso do dispositivo.

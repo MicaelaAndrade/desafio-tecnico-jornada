@@ -103,7 +103,7 @@ npm run test:unit       # apenas as regras de domínio
 npm run test:api        # apenas os testes de API
 npm run test:cov        # com cobertura
 
-# Frontend — 61 testes
+# Frontend — 72 testes
 cd ../frontend
 npm test -- --watch=false
 ```
@@ -260,7 +260,7 @@ Documentação interativa em `/api/docs`. Principais recursos:
 
 ### Testes
 
-São 147 testes — 86 no backend e 61 no frontend —, concentrados onde o risco está.
+São 158 testes — 86 no backend e 72 no frontend —, concentrados onde o risco está.
 
 **Regras de domínio (48).** Funções puras, testadas sem banco, sem framework e sem mock:
 
