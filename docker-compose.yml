@@ -1,7 +1,13 @@
+# Os serviços não fixam `container_name` de propósito. Nome fixo colide quando
+# um `up` interrompido deixa contêineres pendurados — o próximo `up` falha com
+# "container with given ID already exists", e pior, o DNS interno pode resolver
+# o nome para um contêiner morto, o que aparece como banco inalcançável. Sem
+# ele, o Compose prefixa os nomes com o do projeto e essa classe de falha
+# desaparece. O custo é digitar `docker compose logs api` em vez de
+# `docker logs jornada-api`, que é o que o README já recomenda.
 services:
   db:
     image: postgres:16-alpine
-    container_name: jornada-db
     environment:
       POSTGRES_USER: jornada
       POSTGRES_PASSWORD: jornada
@@ -21,7 +27,6 @@ services:
 
   api:
     build: ./backend
-    container_name: jornada-api
     depends_on:
       db:
         condition: service_healthy
@@ -38,7 +43,6 @@ services:
 
   web:
     build: ./frontend
-    container_name: jornada-web
     depends_on:
       - api
     ports:
