@@ -103,7 +103,7 @@ npm run test:unit       # apenas as regras de domínio
 npm run test:api        # apenas os testes de API
 npm run test:cov        # com cobertura
 
-# Frontend — 32 testes
+# Frontend — 38 testes
 cd ../frontend
 npm test -- --watch=false
 ```
@@ -259,7 +259,7 @@ Documentação interativa em `/api/docs`. Principais recursos:
 
 ### Testes
 
-São 118 testes — 86 no backend e 32 no frontend —, concentrados onde o risco está.
+São 124 testes — 86 no backend e 38 no frontend —, concentrados onde o risco está.
 
 **Regras de domínio (48).** Funções puras, testadas sem banco, sem framework e sem mock:
 
@@ -288,7 +288,7 @@ produção. Entre os casos cobertos:
 - fechamento recusado com dia inconsistente, homologação com ressalva, bloqueio de
   marcações no período fechado e reabertura privativa do RH.
 
-**Frontend (32).** Formatação de duração e saldo, resolução de dia da semana sem depender
+**Frontend (38).** Formatação de duração e saldo, resolução de dia da semana sem depender
 do fuso do navegador, guarda de rota por papel, e o interceptor HTTP — que anexa o token
 apenas a chamadas da própria API e encerra a sessão quando o servidor a recusa. Na tela de
 marcação, verifica-se que só são oferecidas as marcações válidas para o estado atual da

@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -76,6 +77,9 @@ export interface DadosCorrecao {
                 </mat-option>
               }
             </mat-select>
+            @if (form.controls.targetEntryId.invalid) {
+              <mat-error>Escolha qual marcação deve ser removida.</mat-error>
+            }
           </mat-form-field>
         }
 
@@ -138,6 +142,37 @@ export class SolicitarCorrecaoDialog {
     targetEntryId: [''],
     reason: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
   });
+
+  constructor() {
+    this.ajustarValidacao(this.form.controls.type.value);
+
+    this.form.controls.type.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((tipo) => this.ajustarValidacao(tipo));
+  }
+
+  /**
+   * "Remover" exige escolher qual marcação; "incluir" não usa esse campo.
+   *
+   * Sem o validador condicional, o botão de enviar ficava habilitado com o campo
+   * vazio e a API recusava a requisição com "targetEntryId must be a UUID" — erro
+   * técnico, exibido tarde, para algo que a tela deveria ter impedido antes.
+   */
+  private ajustarValidacao(tipo: 'ADD' | 'REMOVE'): void {
+    const alvo = this.form.controls.targetEntryId;
+
+    if (tipo === 'REMOVE') {
+      alvo.addValidators(Validators.required);
+      // O caso comum é remover uma marcação duplicada; deixar o campo vazio só
+      // acrescenta um passo a quem já sabe o que veio fazer.
+      if (!alvo.value) alvo.setValue(this.dados.entries[0]?.id ?? '');
+    } else {
+      alvo.clearValidators();
+      alvo.setValue('');
+    }
+
+    alvo.updateValueAndValidity();
+  }
 
   rotulo(tipo: TimeEntryType): string {
     return TIPO_MARCACAO_LABEL[tipo];
