@@ -138,19 +138,16 @@ Os testes do frontend rodam em Chrome headless. Em ambiente sem Chrome instalado
 variável `CHROME_BIN` para o executável — o launcher já está configurado sem sandbox, para
 funcionar dentro de contêiner.
 
-**Suíte separada contra PostgreSQL real** (ver "Limitações conhecidas"): o repositório em
-memória não exercita migrations, constraints de integridade nem atomicidade de transação de
-verdade. Uma suíte à parte cobre exatamente isso, subindo um Postgres efêmero com
-Testcontainers:
+**Suíte separada contra PostgreSQL real** (ver "Arquitetura → Testes"): cobre migrations,
+constraints e atomicidade de transação contra um Postgres de verdade, algo que o
+repositório em memória não exercita.
 
 ```bash
 cd backend
 npm run test:db
 ```
 
-Exige Docker disponível — por isso fica fora do `npm test` padrão. Sobe um contêiner
-`postgres:16-alpine`, roda as migrations reais do projeto contra ele e usa o Prisma Client
-de verdade, sem repositório em memória.
+Exige Docker disponível — por isso fica fora do `npm test` padrão.
 
 ---
 
