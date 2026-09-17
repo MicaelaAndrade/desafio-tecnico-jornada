@@ -398,8 +398,8 @@ São escolhas de escopo, não descuidos — cada uma tem um caminho de evoluçã
 Em ordem de valor para a operação descrita:
 
 1. Calendário de feriados por país e escala por dia da semana.
-2. Notificação ao gestor quando houver correção pendente e ao colaborador quando o dia
-   ficar inconsistente.
+2. Notificação ao gestor quando houver correção pendente, ao colaborador quando o dia
+   ficar inconsistente, e quando um novo colaborador for incluído na sua equipe.
 3. Exportação do espelho de ponto em PDF para arquivamento e conferência.
 4. Retenção e anonimização de dados de jornada, conforme GDPR — relevante porque a
    operação inclui a União Europeia.
