@@ -166,10 +166,10 @@ Senha para todos os usuários: `jornada123`
 
 ### Roteiro sugerido de avaliação
 
-1. Entre como **Ana Souza** e registre uma marcação em *Meu ponto*. O botão oferecido
+1. Entre como **Ana Souza** e registre uma marcação em *Ponto*. O botão oferecido
    depende do estado atual da jornada — o sistema não permite escolher uma marcação
    inválida.
-2. Abra o *Espelho de ponto*. O último dia aparece sinalizado: houve entrada, mas não
+2. Abra o *Espelho*. O último dia aparece sinalizado: houve entrada, mas não
    houve saída. O dia não recebe horas estimadas, apenas o apontamento.
 3. Clique no ícone de correção naquele dia e solicite a inclusão da saída, com
    justificativa.
@@ -240,7 +240,7 @@ dá ao RH uma resposta objetiva para "esse mês já pode ser processado?".
 │       ├── common/          tempo, autenticação, escopo de acesso, erros
 │       ├── infra/           acesso a dados
 │       └── modules/         auth · users · time-entries · timesheets · corrections · closings
-├── frontend/                Angular 18 + Material
+├── frontend/                Angular 21 + Material
 │   └── src/app/
 │       ├── core/            modelos, serviços, interceptor, guards
 │       └── features/        login · ponto · espelho · equipe · correções
@@ -324,7 +324,7 @@ produção. Entre os casos cobertos:
 - fechamento recusado com dia inconsistente, homologação com ressalva, bloqueio de
   marcações no período fechado e reabertura privativa do RH.
 
-**Frontend (38).** Formatação de duração e saldo, resolução de dia da semana sem depender
+**Frontend (72).** Formatação de duração e saldo, resolução de dia da semana sem depender
 do fuso do navegador, guarda de rota por papel, e o interceptor HTTP — que anexa o token
 apenas a chamadas da própria API e encerra a sessão quando o servidor a recusa. Na tela de
 marcação, verifica-se que só são oferecidas as marcações válidas para o estado atual da
