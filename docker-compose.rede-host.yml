@@ -1,0 +1,69 @@
+# Alternativa ao docker-compose.yml para quando a rede em ponte que o Compose
+# cria trava a comunicação entre contêineres. Foi assim que apareceu numa
+# instância de GitHub Codespaces: `db` ficava "Healthy", a porta 5432 publicada
+# no host respondia normalmente, mas a API nunca conseguia conectar em
+# `db:5432` pela rede interna — nem erro, nem timeout, a conexão TCP
+# simplesmente nunca fechava. Um teste isolado com `docker run --network host`
+# na mesma máquina conectou na hora, o que aponta o problema para a rede em
+# ponte em si, não para a aplicação, o schema ou o Prisma.
+#
+# Este arquivo tira a rede em ponte do caminho: os três serviços usam a rede
+# do próprio host diretamente, então "db", "api" e "web" conversam por
+# 127.0.0.1 em vez de por um nome resolvido numa rede virtual.
+#
+# É um arquivo autônomo, não somado ao docker-compose.yml — use no lugar dele,
+# não junto:
+#
+#   docker compose -f docker-compose.rede-host.yml up --build
+#
+# Continua disponível em http://localhost:4200, como no caminho padrão.
+#
+# Só funciona em host Linux (Codespaces serve). Não é a configuração padrão
+# porque no Docker Desktop (macOS/Windows) os contêineres rodam dentro de uma
+# VM e `network_mode: host` não expõe portas da mesma forma — por isso a
+# maioria de quem for avaliar o projeto deve usar o docker-compose.yml normal,
+# e só recorrer a este se topar com o mesmo sintoma (API presa em "Banco ainda
+# não respondeu" com o `db` já saudável).
+services:
+  db:
+    image: postgres:16-alpine
+    network_mode: host
+    environment:
+      POSTGRES_USER: jornada
+      POSTGRES_PASSWORD: jornada
+      POSTGRES_DB: jornada
+      TZ: UTC
+    volumes:
+      - jornada-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U jornada -d jornada']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ./backend
+    network_mode: host
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://jornada:jornada@127.0.0.1:5432/jornada?schema=public
+      JWT_SECRET: segredo-de-desenvolvimento-nao-usar-em-producao
+      JWT_EXPIRES_IN: 8h
+      PORT: 3000
+      NODE_ENV: development
+      CORS_ORIGIN: http://localhost:4200
+      TZ: UTC
+
+  web:
+    build: ./frontend
+    network_mode: host
+    depends_on:
+      - api
+    environment:
+      API_UPSTREAM: 127.0.0.1:3000
+      LISTEN_PORT: '4200'
+
+volumes:
+  jornada-db-data:

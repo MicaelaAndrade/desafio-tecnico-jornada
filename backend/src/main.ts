@@ -10,7 +10,7 @@ async function bootstrap(): Promise<void> {
 
   /**
    * Confia no cabeçalho `X-Forwarded-For` de exatamente um salto — o nginx que
-   * serve o frontend e encaminha `/api` (ver `frontend/nginx.conf`).
+   * serve o frontend e encaminha `/api` (ver `frontend/nginx.conf.template`).
    *
    * Sem isso, toda requisição chega ao Nest com o IP do container do nginx, e o
    * limite de 5 logins por minuto passa a ser compartilhado por toda a empresa:

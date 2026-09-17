@@ -1,5 +1,5 @@
 server {
-  listen 80;
+  listen ${LISTEN_PORT};
   server_name _;
 
   root /usr/share/nginx/html;
@@ -7,8 +7,15 @@ server {
 
   # A API é servida sob o mesmo domínio do frontend. Isso elimina CORS e mantém
   # o token fora de requisições cross-origin.
+  #
+  # API_UPSTREAM e LISTEN_PORT vêm do ambiente (ver docker-compose.yml) e são
+  # substituídos aqui pelo próprio entrypoint da imagem oficial do nginx antes
+  # do servidor subir — não é um mecanismo deste projeto. Existem porque o modo
+  # de rede do host (usado como contorno para um bug de rede em ponte visto em
+  # alguns ambientes, ver docker-compose.rede-host.yml) muda tanto o endereço
+  # da API quanto a porta em que o próprio nginx escuta.
   location /api/ {
-    proxy_pass http://api:3000/api/;
+    proxy_pass http://${API_UPSTREAM}/api/;
     proxy_http_version 1.1;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
