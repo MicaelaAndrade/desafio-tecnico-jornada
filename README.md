@@ -296,7 +296,9 @@ Documentação interativa em `/api/docs`. Principais recursos:
 
 ### Testes
 
-São 158 testes — 86 no backend e 72 no frontend —, concentrados onde o risco está.
+São 158 testes — 86 no backend e 72 no frontend —, concentrados onde o risco está, mais
+uma suíte separada de 5 testes contra PostgreSQL real (detalhada abaixo), que fica fora
+desses 158 por exigir Docker.
 
 **Regras de domínio (48).** Funções puras, testadas sem banco, sem framework e sem mock:
 
@@ -339,6 +341,17 @@ qualquer outra — um duplo permissivo devolveria dados errados em silêncio. A 
 mantém a suíte executável sem infraestrutura; o que ela não cobre são migrations,
 constraints e atomicidade real de transação, que dependem do PostgreSQL.
 
+**Postgres real (5, suíte separada).** Em
+[`backend/test/db`](backend/test/db/postgres-integration.spec.ts), sobe um
+PostgreSQL efêmero com Testcontainers, roda as migrations reais do projeto contra ele e
+usa o Prisma Client de verdade — sem repositório em memória. Verifica constraints de
+integridade (unicidade de e-mail, chave estrangeira de marcação, unicidade composta de
+fechamento mensal) e, o caso mais importante, que uma falha no segundo passo da
+transação de homologação de correção reverte de fato o primeiro passo já escrito (a
+revogação da marcação antiga) — atomicidade real, não simulada. Exige Docker, por isso
+fica fora do `npm test` padrão; roda com `npm run test:db` (ver "Testes" em "Como
+executar").
+
 ---
 
 ## Premissas assumidas
@@ -379,13 +392,6 @@ São escolhas de escopo, não descuidos — cada uma tem um caminho de evoluçã
   leitura da planilha e a conciliação, que dependem do formato real usado pela empresa.
 - **Hierarquia de um nível.** Gestor de gestor não enxerga a equipe estendida.
 - **Sem refresh token.** A sessão dura o tempo do access token (8h) e exige novo login.
-- ~~**Testes contra o banco real.**~~ Coberto: uma suíte separada
-  (`backend/test/db`, `npm run test:db`) sobe um PostgreSQL efêmero com Testcontainers,
-  roda as migrations reais do projeto e verifica constraints de integridade (unicidade de
-  e-mail, chave estrangeira de marcação, unicidade composta de fechamento mensal) e a
-  atomicidade da transação de homologação de correção — algo que o repositório em memória
-  usado no resto da suíte não tem como reproduzir. Fica fora do `npm test` padrão por
-  exigir Docker; ver "Testes" acima.
 - **Desempenho em volume.** A folha de ponto lê os eventos do período e agrega em
   aplicação. É adequado para a ordem de grandeza do problema; em volume maior, o caminho
   é uma view materializada por competência.
