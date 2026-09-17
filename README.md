@@ -50,11 +50,7 @@ docker compose up --build
 Na primeira execução o banco é criado, as migrations são aplicadas e a carga de
 demonstração é inserida automaticamente. A API espera o PostgreSQL ficar
 disponível antes de aplicar as migrations — na primeira subida o Postgres
-reinicia depois do `initdb`, e sem essa espera a conexão seria recusada. Em uma
-máquina compartilhada ou sob carga (por exemplo, um Codespace básico) esse
-reinício pode levar bem mais que alguns segundos; a API tenta se conectar por
-até 6 minutos antes de desistir, então a demora inicial no log `Banco ainda
-não respondeu (tentativa N de 90)` é esperada e não indica falha.
+reinicia depois do `initdb`, e sem essa espera a conexão seria recusada.
 
 Se quiser recomeçar do zero, `docker compose down -v` remove o volume do banco
 junto. Para reinserir apenas a carga de demonstração, sem derrubar nada:
@@ -63,22 +59,16 @@ junto. Para reinserir apenas a carga de demonstração, sem derrubar nada:
 docker compose exec api npx prisma db seed
 ```
 
-**Se a API ficar presa em "Banco ainda não respondeu" mesmo com o `db` já
-"Healthy":** em uma instância de GitHub Codespaces observamos a rede em ponte
-que o Compose cria travar a comunicação entre contêineres — a porta 5432
-publicada no host respondia normalmente, mas `api` nunca completava a conexão
-TCP com `db:5432` pela rede interna, sem erro nenhum, só travado. Um teste
-isolado com `docker run --network host` na mesma máquina conectou
-imediatamente, isolando o problema na rede em ponte em si, não na aplicação
-ou no schema. Para contornar, use a rede do host diretamente:
+Se a API ficar presa tentando conectar no banco mesmo com o serviço `db` já
+saudável — visto em algum ambiente com a rede em ponte do Compose bloqueada —,
+use `docker-compose.rede-host.yml` no lugar do arquivo padrão (motivo e
+diagnóstico comentados no próprio arquivo):
 
 ```bash
 docker compose -f docker-compose.rede-host.yml up --build
 ```
 
-Esse arquivo é autônomo (não some ao `docker-compose.yml` — substitui, não
-complementa) e mantém a aplicação em http://localhost:4200. Funciona em host
-Linux, o que cobre Codespaces; não é a configuração padrão porque no Docker
+Continua disponível em http://localhost:4200. Não é a configuração padrão porque no Docker
 Desktop (macOS/Windows) os contêineres rodam dentro de uma VM e
 `network_mode: host` não expõe portas do mesmo jeito.
 
