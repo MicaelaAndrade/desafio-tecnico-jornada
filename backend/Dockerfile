@@ -11,8 +11,13 @@ WORKDIR /app
 # camada de compatibilidade com a glibc. Sem eles o cliente gera mas não conecta.
 RUN apk add --no-cache openssl libc6-compat
 
+# --ignore-scripts é necessário aqui: o `postinstall` do package.json roda `prisma
+# generate`, e nesta camada só package*.json foi copiado ainda — prisma/schema.prisma
+# só chega no COPY . . de baixo. Sem isso o build quebra com "Could not find Prisma
+# Schema" bem no meio do npm ci. O generate de verdade continua na linha de baixo,
+# que já roda depois do COPY . ., quando o schema existe.
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --ignore-scripts
 
 COPY . .
 
