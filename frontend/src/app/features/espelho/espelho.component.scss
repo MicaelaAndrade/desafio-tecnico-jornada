@@ -60,8 +60,19 @@
   // Esse chip é só um indicador de status (aberta/fechada), sem (click) — os outros
   // dois no mesmo conjunto são filtros de verdade. Sem isso os três ficam visualmente
   // idênticos e o status parece clicável.
+  //
+  // O cursor de verdade não é definido no <mat-chip> (esse aqui embaixo), e sim num
+  // <span> interno do template do próprio Material (.mdc-evolution-chip__action), que
+  // fica fora do encapsulamento de estilo do componente — por isso precisa de
+  // ::ng-deep. O !important é necessário porque a regra do Material
+  // (`cursor: pointer`) tem a mesma especificidade e a ordem de carregamento dos
+  // estilos de um componente de terceiros não é garantida.
   .chip-status {
     cursor: default;
+
+    ::ng-deep .mdc-evolution-chip__action {
+      cursor: default !important;
+    }
 
     &:hover {
       box-shadow: none;
