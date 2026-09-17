@@ -32,8 +32,11 @@
 
     <mat-menu #menu="matMenu">
       <div class="identidade" mat-menu-item disabled>
-        <strong>{{ auth.usuario()?.name }}</strong>
-        <small>{{ auth.usuario()?.baseTimezone }}</small>
+        <span class="avatar-perfil">{{ iniciais() }}</span>
+        <span class="dados">
+          <strong>{{ auth.usuario()?.name }}</strong>
+          <small>{{ auth.usuario()?.baseTimezone }}</small>
+        </span>
       </div>
       <button mat-menu-item (click)="sair()">
         <mat-icon>logout</mat-icon>
