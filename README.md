@@ -392,6 +392,10 @@ São escolhas de escopo, não descuidos — cada uma tem um caminho de evoluçã
 - **Desempenho em volume.** A folha de ponto lê os eventos do período e agrega em
   aplicação. É adequado para a ordem de grandeza do problema; em volume maior, o caminho
   é uma view materializada por competência.
+- **Cadastro de colaborador sem tela própria.** A API (`POST /api/users`, restrita a RH)
+  já valida e persiste um novo colaborador — inclusive a checagem de gestor existente —,
+  mas não há formulário no frontend para isso ainda. Pode ser exercitado direto pelo
+  Swagger (`/api/docs`) autenticado como `helena.martins@ddgroup.example`.
 
 ## Próximos passos
 
