@@ -7,8 +7,8 @@
 # projeto, e por isso a pior hora para falhar.
 set -e
 
-TENTATIVAS=30
-INTERVALO=2
+TENTATIVAS=90
+INTERVALO=4
 
 # 1. Espera o banco aceitar conexões de verdade.
 #
@@ -20,6 +20,14 @@ INTERVALO=2
 # Quem espera é o próprio `migrate deploy`, não um `pg_isready` à parte: assim a
 # condição de parada é "a migration passou", que é o que de fato precisamos, e
 # não uma aproximação dela.
+#
+# 90 tentativas × 4s = 6 minutos de orçamento. Parece muito para um ciclo que,
+# numa máquina folgada, termina em 1-2 segundos — mas numa Codespace
+# compartilhada e sob carga, o reinício do Postgres depois do `initdb` já foi
+# observado levando bem mais que os 60-90s que este script dava antes. O custo
+# de esperar demais é zero (o loop sai assim que `migrate deploy` funciona); o
+# custo de esperar de menos é a pessoa avaliando o desafio ver a API cair antes
+# de o banco terminar de subir, o que parece bug de conexão e não é.
 echo "Aplicando migrations..."
 
 tentativa=1

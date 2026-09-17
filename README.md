@@ -50,7 +50,11 @@ docker compose up --build
 Na primeira execução o banco é criado, as migrations são aplicadas e a carga de
 demonstração é inserida automaticamente. A API espera o PostgreSQL ficar
 disponível antes de aplicar as migrations — na primeira subida o Postgres
-reinicia depois do `initdb`, e sem essa espera a conexão seria recusada.
+reinicia depois do `initdb`, e sem essa espera a conexão seria recusada. Em uma
+máquina compartilhada ou sob carga (por exemplo, um Codespace básico) esse
+reinício pode levar bem mais que alguns segundos; a API tenta se conectar por
+até 6 minutos antes de desistir, então a demora inicial no log `Banco ainda
+não respondeu (tentativa N de 90)` é esperada e não indica falha.
 
 Se quiser recomeçar do zero, `docker compose down -v` remove o volume do banco
 junto. Para reinserir apenas a carga de demonstração, sem derrubar nada:
