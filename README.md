@@ -140,13 +140,27 @@ cd ../frontend
 npm test -- --watch=false
 ```
 
-Nenhum teste do backend exige banco de dados, Docker ou aplicação no ar: os testes de API
-sobem a aplicação NestJS de verdade e substituem apenas o acesso a dados por um repositório
-em memória. Rodam em qualquer ambiente e servem como porta de CI.
+Nenhum teste acima exige banco de dados, Docker ou aplicação no ar: os testes de API sobem
+a aplicação NestJS de verdade e substituem apenas o acesso a dados por um repositório em
+memória. Rodam em qualquer ambiente e servem como porta de CI.
 
 Os testes do frontend rodam em Chrome headless. Em ambiente sem Chrome instalado, aponte a
 variável `CHROME_BIN` para o executável — o launcher já está configurado sem sandbox, para
 funcionar dentro de contêiner.
+
+**Suíte separada contra PostgreSQL real** (ver "Limitações conhecidas"): o repositório em
+memória não exercita migrations, constraints de integridade nem atomicidade de transação de
+verdade. Uma suíte à parte cobre exatamente isso, subindo um Postgres efêmero com
+Testcontainers:
+
+```bash
+cd backend
+npm run test:db
+```
+
+Exige Docker disponível — por isso fica fora do `npm test` padrão. Sobe um contêiner
+`postgres:16-alpine`, roda as migrations reais do projeto contra ele e usa o Prisma Client
+de verdade, sem repositório em memória.
 
 ---
 
@@ -375,10 +389,13 @@ São escolhas de escopo, não descuidos — cada uma tem um caminho de evoluçã
   leitura da planilha e a conciliação, que dependem do formato real usado pela empresa.
 - **Hierarquia de um nível.** Gestor de gestor não enxerga a equipe estendida.
 - **Sem refresh token.** A sessão dura o tempo do access token (8h) e exige novo login.
-- **Testes contra o banco real.** Os testes de API rodam sobre um repositório em memória,
-  o que os torna rápidos e independentes de infraestrutura, mas deixa de fora migrations,
-  constraints de integridade e atomicidade de transação. A evolução natural é uma segunda
-  suíte com PostgreSQL efêmero (Testcontainers), executada no CI.
+- ~~**Testes contra o banco real.**~~ Coberto: uma suíte separada
+  (`backend/test/db`, `npm run test:db`) sobe um PostgreSQL efêmero com Testcontainers,
+  roda as migrations reais do projeto e verifica constraints de integridade (unicidade de
+  e-mail, chave estrangeira de marcação, unicidade composta de fechamento mensal) e a
+  atomicidade da transação de homologação de correção — algo que o repositório em memória
+  usado no resto da suíte não tem como reproduzir. Fica fora do `npm test` padrão por
+  exigir Docker; ver "Testes" acima.
 - **Desempenho em volume.** A folha de ponto lê os eventos do período e agrega em
   aplicação. É adequado para a ordem de grandeza do problema; em volume maior, o caminho
   é uma view materializada por competência.

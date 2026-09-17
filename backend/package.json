@@ -10,7 +10,7 @@
     "build": "nest build",
     "start": "nest start",
     "start:dev": "nest start --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/src/main",
     "demo": "ts-node --transpile-only demo-server.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
@@ -19,6 +19,7 @@
     "test": "jest",
     "test:unit": "jest src",
     "test:api": "jest test/api",
+    "test:db": "jest --config jest-db.config.js",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
@@ -50,6 +51,7 @@
     "@nestjs/cli": "^11.0.24",
     "@nestjs/schematics": "^11.1.0",
     "@nestjs/testing": "^11.2.4",
+    "@testcontainers/postgresql": "^12.1.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
@@ -61,6 +63,7 @@
     "prettier": "^3.9.6",
     "prisma": "^5.22.0",
     "supertest": "^7.0.0",
+    "testcontainers": "^12.1.0",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
@@ -74,6 +77,10 @@
     ],
     "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "<rootDir>/test/db/"
+    ],
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
