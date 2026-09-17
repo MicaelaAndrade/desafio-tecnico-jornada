@@ -45,7 +45,11 @@
 
         <div class="marcadores">
           <mat-chip-set>
-            <mat-chip [highlighted]="dados.closingStatus === 'CLOSED'">
+            <mat-chip
+              class="chip-status"
+              [disableRipple]="true"
+              [highlighted]="dados.closingStatus === 'CLOSED'"
+            >
               <mat-icon matChipAvatar>{{
                 dados.closingStatus === 'CLOSED' ? 'lock' : 'lock_open'
               }}</mat-icon>

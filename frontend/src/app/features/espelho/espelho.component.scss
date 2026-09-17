@@ -56,6 +56,17 @@
 .marcadores {
   display: flex;
   justify-content: center;
+
+  // Esse chip é só um indicador de status (aberta/fechada), sem (click) — os outros
+  // dois no mesmo conjunto são filtros de verdade. Sem isso os três ficam visualmente
+  // idênticos e o status parece clicável.
+  .chip-status {
+    cursor: default;
+
+    &:hover {
+      box-shadow: none;
+    }
+  }
 }
 
 .positivo {
