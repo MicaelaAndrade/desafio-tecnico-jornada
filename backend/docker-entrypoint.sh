@@ -50,9 +50,9 @@ done
 # 2. O seed não derruba a API.
 #
 # Antes, os três comandos eram encadeados com `&&`: um seed que falhasse
-# impedia o `node dist/main` de rodar, e o sintoma era um 502 do nginx — que não
-# diz nada sobre a causa. Dado de demonstração é conveniência; a aplicação
-# subir é requisito. O aviso fica no log, alto, e quem precisar reexecuta com
+# impedia a API de subir, e o sintoma era um 502 do nginx — que não diz nada
+# sobre a causa. Dado de demonstração é conveniência; a aplicação subir é
+# requisito. O aviso fica no log, alto, e quem precisar reexecuta com
 # `docker compose exec api npx prisma db seed`.
 echo "Populando cenário de demonstração..."
 
@@ -62,4 +62,15 @@ if ! npx prisma db seed; then
   echo "  docker compose exec api npx prisma db seed" >&2
 fi
 
-exec node dist/main
+# 3. O caminho do build compilado não é `dist/main.js`.
+#
+# `sourceRoot` do Nest é `src`, mas nada em tsconfig.json restringe o
+# `rootDir` da compilação a essa pasta — e o projeto também compila
+# `prisma/seed.ts` (fora de `src`) no mesmo `tsc`. Sem um `rootDir` comum
+# menor que a raiz do projeto, o TypeScript espelha a estrutura de pastas de
+# entrada dentro de `dist/`, então o `main.ts` de `src/` sai em
+# `dist/src/main.js`, não em `dist/main.js`. Isso nunca apareceu em
+# desenvolvimento porque `npm run start` usa `nest start`, que já sabe onde
+# procurar — só o `node dist/main` direto, usado só aqui no contêiner, dependia
+# do caminho errado.
+exec node dist/src/main
