@@ -125,7 +125,7 @@ npm run test:unit       # apenas as regras de domínio
 npm run test:api        # apenas os testes de API
 npm run test:cov        # com cobertura
 
-# Frontend — 72 testes
+# Frontend — 73 testes
 cd ../frontend
 npm test -- --watch=false
 ```
@@ -293,7 +293,7 @@ Documentação interativa em `/api/docs`. Principais recursos:
 
 ### Testes
 
-São 158 testes — 86 no backend e 72 no frontend —, concentrados onde o risco está, mais
+São 159 testes — 86 no backend e 73 no frontend —, concentrados onde o risco está, mais
 uma suíte separada de 5 testes contra PostgreSQL real (detalhada abaixo), que fica fora
 desses 158 por exigir Docker.
 
@@ -324,12 +324,14 @@ produção. Entre os casos cobertos:
 - fechamento recusado com dia inconsistente, homologação com ressalva, bloqueio de
   marcações no período fechado e reabertura privativa do RH.
 
-**Frontend (72).** Formatação de duração e saldo, resolução de dia da semana sem depender
+**Frontend (73).** Formatação de duração e saldo, resolução de dia da semana sem depender
 do fuso do navegador, guarda de rota por papel, e o interceptor HTTP — que anexa o token
 apenas a chamadas da própria API e encerra a sessão quando o servidor a recusa. Na tela de
 marcação, verifica-se que só são oferecidas as marcações válidas para o estado atual da
 jornada, que nenhum horário é enviado pelo cliente, e que um turno em aberto consulta o dia
-da jornada em vez do dia de hoje.
+da jornada em vez do dia de hoje. Na solicitação de correção, verifica-se que tipo e horário
+da marcação a incluir são exigidos explicitamente — não há valor pré-preenchido que passe
+despercebido — e que a remoção exige escolher qual marcação apagar.
 
 O acesso a dados do backend é substituído por um repositório em memória
 ([`test/support/in-memory-prisma.ts`](backend/test/support/in-memory-prisma.ts)), que

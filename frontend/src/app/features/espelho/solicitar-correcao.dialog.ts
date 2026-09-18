@@ -135,10 +135,20 @@ export class SolicitarCorrecaoDialog {
   readonly tipos: TimeEntryType[] = ['CLOCK_IN', 'BREAK_START', 'BREAK_END', 'CLOCK_OUT'];
   readonly diaFormatado = formatarDiaComSemana(this.dados.workDate);
 
+  /**
+   * "Tipo da marcação" e "Horário correto" começam vazios, de propósito.
+   *
+   * Um valor pré-preenchido "plausível" (por exemplo CLOCK_OUT às 18:00) é mais
+   * perigoso que um campo vazio: ele passa despercebido por quem preenche e por
+   * quem homologa, e pode ser enviado sem querer — criando uma marcação que não
+   * corresponde a nada real e, pior, atrapalhando o cálculo do dia em vez de
+   * corrigi-lo. Exigir que a pessoa escolha e digite de propósito é o que evita
+   * esse tipo de erro silencioso.
+   */
   readonly form = this.fb.nonNullable.group({
     type: ['ADD' as 'ADD' | 'REMOVE', Validators.required],
-    proposedType: ['CLOCK_OUT' as TimeEntryType],
-    horario: ['18:00'],
+    proposedType: ['' as TimeEntryType | '', Validators.required],
+    horario: ['', Validators.required],
     targetEntryId: [''],
     reason: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
   });
@@ -152,26 +162,42 @@ export class SolicitarCorrecaoDialog {
   }
 
   /**
-   * "Remover" exige escolher qual marcação; "incluir" não usa esse campo.
+   * "Remover" exige escolher qual marcação; "incluir" exige tipo e horário da
+   * marcação a adicionar. Cada modo só valida (e só envia) os campos que usa.
    *
-   * Sem o validador condicional, o botão de enviar ficava habilitado com o campo
-   * vazio e a API recusava a requisição com "targetEntryId must be a UUID" — erro
-   * técnico, exibido tarde, para algo que a tela deveria ter impedido antes.
+   * Sem o validador condicional, o botão de enviar ficava habilitado com campo
+   * vazio e a API recusava a requisição com erro técnico, exibido tarde, para
+   * algo que a tela deveria ter impedido antes — foi o que aconteceu com
+   * targetEntryId originalmente, e o mesmo risco existia para proposedType e
+   * horario, que chegavam pré-preenchidos com um valor "plausível" (CLOCK_OUT
+   * às 18:00) em vez de vazios: dava para enviar sem escolher nada de verdade.
    */
   private ajustarValidacao(tipo: 'ADD' | 'REMOVE'): void {
     const alvo = this.form.controls.targetEntryId;
+    const proposedType = this.form.controls.proposedType;
+    const horario = this.form.controls.horario;
 
     if (tipo === 'REMOVE') {
       alvo.addValidators(Validators.required);
       // O caso comum é remover uma marcação duplicada; deixar o campo vazio só
       // acrescenta um passo a quem já sabe o que veio fazer.
       if (!alvo.value) alvo.setValue(this.dados.entries[0]?.id ?? '');
+
+      proposedType.clearValidators();
+      proposedType.setValue('');
+      horario.clearValidators();
+      horario.setValue('');
     } else {
       alvo.clearValidators();
       alvo.setValue('');
+
+      proposedType.addValidators(Validators.required);
+      horario.addValidators(Validators.required);
     }
 
     alvo.updateValueAndValidity();
+    proposedType.updateValueAndValidity();
+    horario.updateValueAndValidity();
   }
 
   rotulo(tipo: TimeEntryType): string {
@@ -189,7 +215,10 @@ export class SolicitarCorrecaoDialog {
         ? {
             userId: this.dados.userId,
             type: 'ADD' as const,
-            proposedType: valores.proposedType,
+            // O form.invalid já garante, no guard acima, que proposedType não é
+            // mais '' neste ponto — o cast só reflete pro TypeScript o que a
+            // validação do formulário já assegurou.
+            proposedType: valores.proposedType as TimeEntryType,
             // O horário digitado é local; o servidor recebe o instante já posicionado
             // no fuso do registro para não depender do relógio do navegador.
             proposedOccurredAt: this.paraInstanteUtc(valores.horario),
