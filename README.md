@@ -398,6 +398,13 @@ São escolhas de escopo, não descuidos — cada uma tem um caminho de evoluçã
   já valida e persiste um novo colaborador — inclusive a checagem de gestor existente —,
   mas não há formulário no frontend para isso ainda. Pode ser exercitado direto pelo
   Swagger (`/api/docs`) autenticado como `helena.martins@ddgroup.example`.
+- **Correção com precisão de minuto.** O campo "Horário correto" da solicitação de
+  correção usa `<input type="time">`, que só tem granularidade de minuto, enquanto uma
+  marcação real feita pela web guarda o instante com segundos. Se a marcação corrigida
+  cair no mesmo minuto de outra marcação real do dia, a ordem cronológica entre as duas
+  não é garantida, o que pode afetar o cálculo daquele dia. Na prática isso é raro (exige
+  duas marcações no mesmo minuto), mas evoluir o campo para aceitar segundos remove a
+  ambiguidade.
 
 ## Próximos passos
 
