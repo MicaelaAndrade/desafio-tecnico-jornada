@@ -23,6 +23,11 @@ modelagem, que é o que o enunciado pede.
 O frontend permanece em **Angular**, conforme o ecossistema descrito. O raciocínio completo,
 com as alternativas descartadas, está no [ADR-0001](docs/adr/0001-stack-tecnologica.md).
 
+Como complemento, para mostrar o mesmo raciocínio de domínio em C#/.NET, há uma exploração
+pontual do núcleo de cálculo de jornada em
+[jornada-dotnet-poc](https://github.com/MicaelaAndrade/jornada-dotnet-poc). É um recorte
+pequeno, não uma segunda entrega: a entrega principal é este repositório.
+
 ---
 
 ## Como executar
@@ -68,8 +73,8 @@ diagnóstico comentados no próprio arquivo):
 docker compose -f docker-compose.rede-host.yml up --build
 ```
 
-Continua disponível em http://localhost:4200. Não é a configuração padrão porque no Docker
-Desktop (macOS/Windows) os contêineres rodam dentro de uma VM e
+A aplicação continua disponível em http://localhost:4200. Esse arquivo não é a configuração
+padrão porque no Docker Desktop (macOS/Windows) os contêineres rodam dentro de uma VM e
 `network_mode: host` não expõe portas do mesmo jeito.
 
 | Serviço | Endereço |
@@ -295,7 +300,7 @@ Documentação interativa em `/api/docs`. Principais recursos:
 
 São 159 testes — 86 no backend e 73 no frontend —, concentrados onde o risco está, mais
 uma suíte separada de 5 testes contra PostgreSQL real (detalhada abaixo), que fica fora
-desses 158 por exigir Docker.
+desses 159 por exigir Docker.
 
 **Regras de domínio (48).** Funções puras, testadas sem banco, sem framework e sem mock:
 
