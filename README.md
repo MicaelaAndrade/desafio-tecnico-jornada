@@ -171,16 +171,18 @@ Senha para todos os usuários: `jornada123`
 
 ### Roteiro sugerido de avaliação
 
-1. Entre como **Ana Souza** e registre uma marcação em *Ponto*. O botão oferecido
-   depende do estado atual da jornada — o sistema não permite escolher uma marcação
-   inválida.
-2. Abra o *Espelho*. O último dia aparece sinalizado: houve entrada, mas não
-   houve saída. O dia não recebe horas estimadas, apenas o apontamento.
-3. Clique no ícone de correção naquele dia e solicite a inclusão da saída, com
-   justificativa.
-4. Entre como **Rafael Costa** (gestor), vá em *Correções* e homologue a solicitação.
-   Volte ao espelho da Ana: a marcação passa a existir, marcada como originada de
-   correção, e o apontamento desaparece. Nenhum registro anterior foi alterado.
+1. Entre como **Ana Souza** e abra o *Espelho* (não interaja com o botão de *Ponto*
+   ainda — a opção oferecida ali depende do estado atual da jornada, e usá-la agora
+   fecharia o dia em aberto que é justamente o cenário deste passo).
+2. O último dia aparece sinalizado: houve entrada, mas não houve saída. O dia não
+   recebe horas estimadas, apenas o apontamento.
+3. Clique no ícone de correção naquele dia. Os dados de demonstração já incluem uma
+   solicitação pendente para essa saída, com justificativa — não é necessário criar
+   uma nova.
+4. Entre como **Rafael Costa** (gestor), vá em *Correções* e homologue essa
+   solicitação. Volte ao espelho da Ana: a marcação passa a existir, marcada como
+   originada de correção, e o apontamento desaparece. Nenhum registro anterior foi
+   alterado.
 5. Entre como **Diego Ramos** e veja no espelho os dias cumpridos em Lisboa: o horário
    exibido é o local de Portugal, e o dia carrega o ícone de jornada fora do fuso
    contratual.
